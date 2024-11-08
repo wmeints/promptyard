@@ -24,6 +24,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@azure/cosmos": "^4.1.1",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@types/node": "^20",
