@@ -58,7 +58,7 @@ jobs:
 
     name: Package docker container
     runs-on: ubuntu-latest
-    depends_on: verify
+    needs: verify
 
     steps:
     - name: Set up Docker Buildx
