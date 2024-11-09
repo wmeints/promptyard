@@ -1,22 +1,110 @@
 "use client";
 
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Bars3Icon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react'; // Added import
+import Link from 'next/link';
+import type { Session } from 'next-auth';
 
+const userNavigation = [
+    { name: 'Settings', href: '/user/settings' },
+]
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function StackedLayout({ children }: { children: ReactNode }) {
+interface UserProfile {
+    name?: string | null
+    email?: string | null
+    image?: string | null
+}
+
+function ProfileDropdown({ session, user }: { session: Session | undefined | null, user: UserProfile | undefined | null }) {
+    function handleSignIn() {
+        if (!session) {
+            signIn();
+            return false;
+        }
+    }
+
+    function handleSignOut() {
+        signOut();
+    }
+
+    return (
+        <Menu as="div" className="relative ml-3">
+            <div>
+                <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" onClick={handleSignIn}>
+                    <span className="absolute -inset-1.5" />
+                    {session && (
+                        <>
+                            <span className="me-2">{user?.name}</span>
+                            <UserIcon className="h-8 w-8 rounded-full text-gray-400" />
+                        </>
+                    )}
+                    {!session && (
+                        <>
+                            <span>Sign in</span>
+                            <UserIcon className="h-8 w-8 rounded-full text-gray-400" />
+                        </>
+                    )}
+                </MenuButton>
+            </div>{session && (
+                <MenuItems
+                    transition
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                    {userNavigation.map((item) => (
+                        <MenuItem key={item.name}>
+                            <a
+                                href={item.href}
+                                className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                            >
+                                {item.name}
+                            </a>
+                        </MenuItem>
+                    ))}
+
+                    <MenuItem>
+                        <a
+                            onClick={handleSignOut}
+                            href="#"
+                            className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                        >
+                            Sign out
+                        </a>
+                    </MenuItem>
+                </MenuItems>
+            )}
+
+        </Menu>
+    );
+}
+
+function InnerStackedLayout({ children }: { children: ReactNode }) {
     const path = usePathname();
+    const { data: session } = useSession();
 
     const navigation = [
         { name: 'Home', href: '/', current: path === '/' },
         { name: 'Prompts', href: '/prompts', current: path.startsWith('/prompts') },
     ]
+
+    const user = session?.user;
+
+    function handleSignIn() {
+        if (!session) {
+            signIn();
+            return false;
+        }
+    }
+
+    function handleSignOut() {
+        signOut();
+    }
 
     return (
         <>
@@ -26,8 +114,7 @@ export default function StackedLayout({ children }: { children: ReactNode }) {
                         <div className="flex h-16 justify-between">
                             <div className="flex">
                                 <div className="flex shrink-0 items-center">
-                                    <span className="block pt-1 w-auto lg:hidden font-bold text-indigo-600">Promptyard</span>
-                                    <span className="hidden pt-1 w-auto lg:block font-bold text-indigo-600">Promptyard</span>
+                                    <Link href="/" className="pt-1 text-indigo-500 font-bold">Promptyard</Link>
                                 </div>
                                 <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                                     {navigation.map((item) => (
@@ -48,7 +135,8 @@ export default function StackedLayout({ children }: { children: ReactNode }) {
                                 </div>
                             </div>
                             <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                                {/* Removed notifications button */}
+                                {/* Profile dropdown */}
+                                <ProfileDropdown user={user} session={session} />
                             </div>
                             <div className="-mr-2 flex items-center sm:hidden">
                                 {/* Mobile menu button */}
@@ -81,6 +169,45 @@ export default function StackedLayout({ children }: { children: ReactNode }) {
                                 </DisclosureButton>
                             ))}
                         </div>
+                        <div className="border-t border-gray-200 pb-3 pt-4">
+                            {session && (
+                                <>
+                                    <div className="flex items-center px-4">
+                                        <div className="text-base font-medium text-gray-800">{user?.name}</div>
+                                    </div>
+                                    <div className="mt-3 space-y-1">
+                                        {userNavigation.map((item) => (
+                                            <DisclosureButton
+                                                key={item.name}
+                                                as="a"
+                                                href={item.href}
+                                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                                            >
+                                                {item.name}
+                                            </DisclosureButton>
+                                        ))}
+                                        <DisclosureButton
+                                            as="a"
+                                            onClick={handleSignOut}
+                                            className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                                        >
+                                            Sign out
+                                        </DisclosureButton>
+                                    </div>
+                                </>
+                            )}
+                            {!session && (
+                                <DisclosureButton
+                                    as="a"
+                                    onClick={handleSignIn}
+                                    href="#"
+                                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                                >
+                                    Sign in
+                                </DisclosureButton>
+                            )}
+
+                        </div>
                     </DisclosurePanel>
                 </Disclosure>
 
@@ -89,5 +216,13 @@ export default function StackedLayout({ children }: { children: ReactNode }) {
                 </div>
             </div>
         </>
+    )
+}
+
+export default function StackedLayout({ children }: { children: ReactNode }) {
+    return (
+        <SessionProvider>
+            <InnerStackedLayout>{children}</InnerStackedLayout>
+        </SessionProvider>
     )
 }
