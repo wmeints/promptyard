@@ -1,8 +1,9 @@
-import { h1 } from "framer-motion/client";
+import PageContent from "@/components/PageContent";
 
 export default function Home() {
   return (
-
-    <h1>Hello world</h1>
+    <PageContent title="Home">
+      <p>Welcome to promptyard!</p>
+    </PageContent>
   );
 }
