@@ -1,12 +1,9 @@
-"use client";
-
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react'; // Added import
 import Link from 'next/link';
-import type { Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authentication';
 
 const userNavigation = [
     { name: 'Settings', href: '/user/settings' },
@@ -16,95 +13,111 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-interface UserProfile {
-    name?: string | null
-    email?: string | null
-    image?: string | null
+function SignInButton() {
+    return (
+        <Link href="/api/auth/signin">
+            <span className="me-2">
+                Sign in
+            </span>
+        </Link>
+    )
 }
 
-function ProfileDropdown({ session, user }: { session: Session | undefined | null, user: UserProfile | undefined | null }) {
-    function handleSignIn() {
-        if (!session) {
-            signIn();
-            return false;
-        }
-    }
-
-    function handleSignOut() {
-        signOut();
-    }
+async function ProfileDropdown() {
+    const sessionData = await getServerSession(authOptions);
+    const user = sessionData?.user;
 
     return (
         <Menu as="div" className="relative ml-3">
             <div>
-                <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" onClick={handleSignIn}>
+                <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span className="absolute -inset-1.5" />
-                    {session && (
-                        <>
-                            <span className="me-2">{user?.name}</span>
-                            <UserIcon className="h-8 w-8 rounded-full text-gray-400" />
-                        </>
-                    )}
-                    {!session && (
-                        <>
-                            <span>Sign in</span>
-                            <UserIcon className="h-8 w-8 rounded-full text-gray-400" />
-                        </>
-                    )}
-                </MenuButton>
-            </div>{session && (
-                <MenuItems
-                    transition
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-                >
-                    {userNavigation.map((item) => (
-                        <MenuItem key={item.name}>
-                            <a
-                                href={item.href}
-                                className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
-                            >
-                                {item.name}
-                            </a>
-                        </MenuItem>
-                    ))}
 
-                    <MenuItem>
-                        <a
-                            onClick={handleSignOut}
-                            href="#"
+                    <>
+                        <span className="me-2">{user?.name}</span>
+                        <UserIcon className="h-8 w-8 rounded-full text-gray-400" />
+                    </>
+                </MenuButton>
+            </div>
+            <MenuItems
+                transition
+                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+            >
+                {userNavigation.map((item) => (
+                    <MenuItem key={item.name}>
+                        <Link
+                            href={item.href}
                             className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
                         >
-                            Sign out
-                        </a>
+                            {item.name}
+                        </Link>
                     </MenuItem>
-                </MenuItems>
-            )}
+                ))}
 
+                <MenuItem>
+                    <Link
+                        href="/api/auth/signout"
+                        className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                    >
+                        Sign out
+                    </Link>
+                </MenuItem>
+            </MenuItems>
         </Menu>
     );
 }
 
-function InnerStackedLayout({ children }: { children: ReactNode }) {
-    const path = usePathname();
-    const { data: session } = useSession();
-
-    const navigation = [
-        { name: 'Home', href: '/', current: path === '/' },
-        { name: 'Prompts', href: '/prompts', current: path.startsWith('/prompts') },
-    ]
-
+async function MobileProfileMenu() {
+    const session = await getServerSession(authOptions);
     const user = session?.user;
 
-    function handleSignIn() {
-        if (!session) {
-            signIn();
-            return false;
-        }
-    }
+    return (
+        <>
+            <div className="flex items-center px-4">
+                <div className="text-base font-medium text-gray-800">{user?.name}</div>
+            </div>
+            <div className="mt-3 space-y-1">
+                {userNavigation.map((item) => (
+                    <DisclosureButton
+                        key={item.name}
+                        as="a"
+                        href={item.href}
+                        className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                    >
+                        {item.name}
+                    </DisclosureButton>
+                ))}
+                <DisclosureButton
+                    as="a"
+                    href="/api/auth/signout"
+                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                >
+                    Sign out
+                </DisclosureButton>
+            </div>
+        </>
+    )
+}
 
-    function handleSignOut() {
-        signOut();
-    }
+function MobileSignInButton() {
+    return (
+        <DisclosureButton
+            as="a"
+            href="/api/auth/signin"
+            className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+        >
+            Sign in
+        </DisclosureButton>
+    )
+}
+
+export default async function StackedLayout({ children }: { children: ReactNode }) {
+    const session = await getServerSession(authOptions);
+
+    const navigation = [
+        { name: 'Home', href: '/', current: false },
+        { name: 'Prompts', href: '/prompts', current: false },
+    ]
 
     return (
         <>
@@ -135,8 +148,7 @@ function InnerStackedLayout({ children }: { children: ReactNode }) {
                                 </div>
                             </div>
                             <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                                {/* Profile dropdown */}
-                                <ProfileDropdown user={user} session={session} />
+                                {session ? <ProfileDropdown /> : <SignInButton />}
                             </div>
                             <div className="-mr-2 flex items-center sm:hidden">
                                 {/* Mobile menu button */}
@@ -170,43 +182,7 @@ function InnerStackedLayout({ children }: { children: ReactNode }) {
                             ))}
                         </div>
                         <div className="border-t border-gray-200 pb-3 pt-4">
-                            {session && (
-                                <>
-                                    <div className="flex items-center px-4">
-                                        <div className="text-base font-medium text-gray-800">{user?.name}</div>
-                                    </div>
-                                    <div className="mt-3 space-y-1">
-                                        {userNavigation.map((item) => (
-                                            <DisclosureButton
-                                                key={item.name}
-                                                as="a"
-                                                href={item.href}
-                                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                                            >
-                                                {item.name}
-                                            </DisclosureButton>
-                                        ))}
-                                        <DisclosureButton
-                                            as="a"
-                                            onClick={handleSignOut}
-                                            className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                                        >
-                                            Sign out
-                                        </DisclosureButton>
-                                    </div>
-                                </>
-                            )}
-                            {!session && (
-                                <DisclosureButton
-                                    as="a"
-                                    onClick={handleSignIn}
-                                    href="#"
-                                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                                >
-                                    Sign in
-                                </DisclosureButton>
-                            )}
-
+                            {session ? <MobileProfileMenu /> : <MobileSignInButton />}
                         </div>
                     </DisclosurePanel>
                 </Disclosure>
@@ -216,13 +192,5 @@ function InnerStackedLayout({ children }: { children: ReactNode }) {
                 </div>
             </div>
         </>
-    )
-}
-
-export default function StackedLayout({ children }: { children: ReactNode }) {
-    return (
-        <SessionProvider>
-            <InnerStackedLayout>{children}</InnerStackedLayout>
-        </SessionProvider>
     )
 }

@@ -1,7 +1,6 @@
-"use client";
-
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
 import PageContent from "./PageContent";
+import { authOptions } from "@/lib/authentication";
 
 function AccessDenied() {
     return (
@@ -13,8 +12,7 @@ function AccessDenied() {
     )
 }
 
-export default function RestrictedContent({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
-
+export default async function RestrictedContent({ children }: { children: React.ReactNode }) {
+    const session = await getServerSession(authOptions);
     return session ? <>{children}</> : <AccessDenied />;
 }

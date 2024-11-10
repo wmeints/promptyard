@@ -1,43 +1,63 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import RestrictedContent from "@/components/RestrictedContent";
 import PageContent from "@/components/PageContent";
-import Pagination from "@/components/Pagination";
-import prisma from "@/lib/persistence";
-import { getSession } from "next-auth/react";
+import prisma from '@/lib/persistence';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authentication";
+import { Prompt } from "@prisma/client";
+import Link from "next/link";
 
-export default function PromptsPage() {
-  const [prompts, setPrompts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+function PromptListItem({ prompt }: { prompt: Prompt }) {
+  return (
+    <li className="flex items-center justify-between gap-x-6 py-5">
+      <div className="min-w-0">
+        <div className="flex items-start gap-x-3">
+          <p className="text-sm/6 font-semibold text-gray-900">{prompt.title}</p>
 
-  useEffect(() => {
-    async function fetchPrompts() {
-      const session = await getSession();
-      if (session) {
-        const response = await fetch(`/api/prompts?page=${currentPage}`);
-        const data = await response.json();
-        setPrompts(data.prompts);
-        setTotalPages(data.totalPages);
-      }
+        </div>
+        <div className="mt-1 flex items-center gap-x-2 text-xs/5 text-gray-500">
+          <p className="whitespace-nobreak">{new Date(prompt.createdAt).toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          })}</p>
+        </div>
+      </div>
+      <div className="flex flex-none items-center gap-x-4">
+        <Link href={`/prompts/${prompt.id}`} className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block">
+          View details
+        </Link>
+      </div>
+    </li >
+  )
+}
+
+export default async function PromptsPage() {
+  const session = await getServerSession(authOptions);
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: session?.user?.email || "unknown@domain.something"
     }
-    fetchPrompts();
-  }, [currentPage]);
+  });
+
+  const prompts = await prisma.prompt.findMany({
+    where: {
+      userId: user?.id
+    }
+  })
 
   return (
     <RestrictedContent>
       <PageContent title="My Prompts">
-        <ul>
+        <ul role="list">
           {prompts.map((prompt) => (
-            <li key={prompt.id}>{prompt.content}</li>
+            <PromptListItem key={prompt.id} prompt={prompt} />
           ))}
         </ul>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
       </PageContent>
     </RestrictedContent>
   );
