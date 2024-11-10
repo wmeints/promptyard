@@ -1,9 +1,17 @@
 "use client"
 
-import Pagination from "@/components/Pagination";
+import Pagination from "@/components/shared/Pagination";
+import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { Prompt } from "@prisma/client";
 import Link from "next/link"
-import { useEffect, useState } from "react";
+
+interface PromptListProps {
+    prompts: Prompt[];
+    totalPages: number;
+    currentPage: number;
+    onPageChange?: (page: number) => void;
+    showPagination?: boolean;
+}
 
 function PromptListItem({ prompt }: { prompt: Prompt }) {
     return (
@@ -34,31 +42,34 @@ function PromptListItem({ prompt }: { prompt: Prompt }) {
     )
 }
 
-export default function PromptList() {
-    const [prompts, setPrompts] = useState<Prompt[]>([]);
-    const [numPages, setNumPages] = useState<number>(0);
-    const [currentPage, setCurrentPage] = useState<number>(1);
+function EmptyList() {
+    return (
+        <Link
+            href="/prompts/new"
+            type="button"
+            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+            <DocumentPlusIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <span className="mt-2 block text-sm font-semibold text-gray-900">Create a new prompt</span>
+        </Link>
+    )
+}
 
-    useEffect(() => {
-        async function loadPromptData() {
-            const response = await fetch(`/api/prompts?pageIndex=${currentPage - 1}&pageSize=10`);
-            const { items, totalPages } = await response.json();
-
-            setPrompts(items);
-            setNumPages(totalPages);
-        }
-
-        loadPromptData();
-    }, [currentPage])
+function ListWithItems(props: PromptListProps) {
+    const showPagination = props.showPagination == undefined ? true : props.showPagination;
 
     return (
         <>
             <ul role="list">
-                {prompts.map((prompt) => (
+                {props.prompts.map((prompt) => (
                     <PromptListItem key={prompt.id} prompt={prompt} />
                 ))}
             </ul>
-            <Pagination currentPage={currentPage} totalPages={numPages} onPageChange={(page) => setCurrentPage(page)} />
+            {showPagination && <Pagination currentPage={props.currentPage} totalPages={props.totalPages} onPageChange={props.onPageChange} />}
         </>
-    );
+    )
+}
+
+export default function PromptList(props: PromptListProps) {
+    return (props.totalPages > 0 ? <ListWithItems {...props} /> : <EmptyList />)
 }

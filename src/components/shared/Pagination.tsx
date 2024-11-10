@@ -1,9 +1,11 @@
+"use client"
+
 import React from "react";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
+  onPageChange?: (page: number) => void;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -12,13 +14,13 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   const handlePrevious = () => {
-    if (currentPage > 1) {
+    if (currentPage > 1 && onPageChange) {
       onPageChange(currentPage - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages && onPageChange) {
       onPageChange(currentPage + 1);
     }
   };

@@ -1,4 +1,4 @@
-import PageContent from "@/components/PageContent";
+import PageContent from "@/components/shared/PageContent";
 
 export default function NotFound() {
     return (

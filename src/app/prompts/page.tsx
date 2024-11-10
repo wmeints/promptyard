@@ -1,12 +1,12 @@
-import RestrictedContent from "@/components/RestrictedContent";
-import PageContent from "@/components/PageContent";
-import PromptList from "./PromptList";
+import RestrictedContent from "@/components/shared/RestrictedContent";
+import PageContent from "@/components/shared/PageContent";
+import BrowsePrompts from "../../components/prompts/BrowsePrompts";
 
 export default async function PromptsPage() {
   return (
     <RestrictedContent>
       <PageContent title="My Prompts">
-        <PromptList />
+        <BrowsePrompts />
       </PageContent>
     </RestrictedContent>
   );

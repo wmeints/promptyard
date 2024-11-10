@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import StackedLayout from "@/components/StackedLayout";
+import StackedLayout from "@/components/shared/StackedLayout";
 
 export const metadata: Metadata = {
   title: "Promptyard",
