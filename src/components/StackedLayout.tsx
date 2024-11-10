@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authentication';
+import { headers } from 'next/headers';
 
 const userNavigation = [
     { name: 'Settings', href: '/user/settings' },
@@ -113,10 +114,12 @@ function MobileSignInButton() {
 
 export default async function StackedLayout({ children }: { children: ReactNode }) {
     const session = await getServerSession(authOptions);
+    const requestHeaders = await headers();
+    const pathName = requestHeaders.get('X-Pathname');
 
     const navigation = [
-        { name: 'Home', href: '/', current: false },
-        { name: 'Prompts', href: '/prompts', current: false },
+        { name: 'Home', href: '/', current: pathName === '/' },
+        { name: 'Prompts', href: '/prompts', current: pathName?.startsWith('/prompts') },
     ]
 
     return (
