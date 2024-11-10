@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    prompts,
+    items: prompts,
     totalPages: Math.ceil(totalPrompts / pageSize),
   });
 }
