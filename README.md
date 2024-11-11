@@ -15,7 +15,7 @@ workspace for all your prompt management needs.
 - **Usage Analytics:** Understand which prompts perform best to continuously improve your AI interactions.
 
 Promptyard is an ideal companion for developers, and AI enthusiasts who rely on prompt engineering for applications
-across customer support, creative work, coding assistance, and beyond. 
+across customer support, creative work, coding assistance, and beyond.
 
 ## Developing
 
@@ -23,6 +23,11 @@ across customer support, creative work, coding assistance, and beyond.
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Node 22 or higher](https://nodejs.org/en)
+- [Pre-commit](https://pre-commit.com/#install)
+
+**Important:** Make sure you install pre-commit globally, especially if you're using vscode. We found that the
+pre-commit hooks don't work quite right when you have the pre-commit executable only in the virtual environment of the
+project.
 
 ### Restoring dependencies
 
