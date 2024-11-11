@@ -5,3 +5,10 @@ repos:
       - id: commitizen
       - id: commitizen-branch
         stages: [pre-push]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.4
+    hooks:
+      - id: ruff
+        args: [--fix, --config, ruff.toml]
+      - id: ruff-format
+        args: [--config, ruff.toml]
