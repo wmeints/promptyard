@@ -16,3 +16,21 @@ workspace for all your prompt management needs.
 Promptyard is an ideal companion for developers, and AI enthusiasts who rely on prompt engineering for applications
 across customer support, creative work, coding assistance, and beyond. 
 
+## Developing
+
+### System requirements
+
+* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+* [Node 22 or higher](https://nodejs.org/en)
+
+### Restoring dependencies
+
+```bash
+uv sync
+```
+
+### Applying migrations
+
+```bash
+uv run python manage.py migrate
+```
