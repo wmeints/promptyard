@@ -13,6 +13,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "commitizen>=3.30.1",
+    "ruff==0.7.3",
 ]
 
 [tool.commitizen]
