@@ -11,12 +11,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "localhost",
-    "super-broccoli-q7r59g6r95f46rq-8000.app.github.dev"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
-    "https://super-broccoli-q7r59g6r95f46rq-8000.app.github.dev",
     "https://localhost:8000"
 ]
 
