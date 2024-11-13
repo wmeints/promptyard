@@ -9,7 +9,14 @@ SECRET_KEY = "django-insecure-hl$s&(#%&r9@_w7y@jey$622o3mb!^bgfmz^30$-n!q&e=mba5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "https://localhost:8000"
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

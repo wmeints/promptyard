@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "simple_history",
     "taggit",
     "prompts",
+    "profiles",
 ]
 
 MIDDLEWARE = [
