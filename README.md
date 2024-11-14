@@ -17,13 +17,53 @@ workspace for all your prompt management needs.
 Promptyard is an ideal companion for developers, and AI enthusiasts who rely on prompt engineering for applications
 across customer support, creative work, coding assistance, and beyond.
 
+## System requirements
+
+- [UV](https://docs.astral.sh/uv/)
+
+## Getting started
+
+You can run this application on your local machine using the steps in this section.
+
+### Configure Github application
+
+If you want to login using Github, make sure you have an OAuth application registration.
+You can create one on the [Github website](https://github.com/settings/apps/new).
+
+After configuring the OAuth application, create a client secret and store the following
+values in the a `.env` file in the root of the repository:
+
+```environment
+GITHUB_CLIENT_ID=<client id>
+GITHUB_CLIENT_SECRET=<generated client secret>
+```
+
+### Migrating the database
+
+The application uses sqlite in development mode. You do need to run the migrations though.
+Use the following command to migrate the database to the latest version:
+
+```bash
+uv run manage.py migrate
+```
+
+### Starting the application
+
+Use the following command to run the server:
+
+```bash
+uv run manage.py runserver
+```
+
 ## Developing
 
-### System requirements
+This section covers how to work on the code base. You only need this if you want to change
+the behavior of the code on some way.
 
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- [Node 22 or higher](https://nodejs.org/en)
+### System requirements for development
+
 - [Pre-commit](https://pre-commit.com/#install)
+- [UV](https://docs.astral.sh/uv/)
 
 **Important:** Make sure you install pre-commit globally, especially if you're using vscode. We found that the
 pre-commit hooks don't work quite right when you have the pre-commit executable only in the virtual environment of the

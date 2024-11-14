@@ -1,4 +1,5 @@
 # Exclude a variety of commonly ignored directories.
+include = ["core/**/*.py", "profiles/**/*.py", "prompts/**/*.py"]
 exclude = [
     ".bzr",
     ".direnv",
