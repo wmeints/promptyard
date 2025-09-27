@@ -1,9 +1,10 @@
 services:
   database:
-    env:
+    network: host
+    environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_DATABASE: promptyard
+      POSTGRES_DB: promptyard
     image: postgres:17
     ports:
       - 5432:5432
