@@ -1,25 +1,6 @@
 Feature: Authentication
-
-    Scenario: New user signs in to the application
-        Given a user is not registered in the system
-        When they sign in using a configured authentication provider
-        Then they should be redirected to the onboarding page
-
-    Scenario Outline: Onboard new user
-        Given a user is on the onboarding page
-        When they enter the username <username>
-        And they enter the full name <full_name>
-        And they submit the form
-        Then a new repository named <username> is created
-        And a new user profile <username> is created with full name <full_name>
-
-        Examples:
-
-            | username      | full_name     |
-            | wmeints       | Willem Meints |
-            | bob_marley    | Bob Marley    |
-            | alice123      | Alice Smith   |
-            | charley-brown | Charley Brown |
+    As a user of the application I want to sign in to the application so I can
+    access my personal profile and repositories.
 
     Scenario: User signs in with existing account
         Given a user is registered in the system
