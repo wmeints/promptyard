@@ -1,0 +1,14 @@
+{
+  "name": "promptyard",
+  "version": "0.1.0",
+  "description": "Install and manage prompt templates",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
