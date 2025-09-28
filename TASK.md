@@ -1,18 +1,29 @@
-# Feature: <Feature Name>
+# Feature: Create prompt templates
 
-<Describe the feature that you want to implement here.>
+I want users to be able to create prompt templates either in their personal
+profile or as part of a prompt template repository.
 
-## Examples
+## Creating prompt templates in the personal profile
 
-<Insert examples here. You can provide them inline, or list files located in
-the `examples` folder if you have longer examples.>
+Users have a special prompt template repo attached to their user profile.
+They can add prompt templates through their personal profile page. 
 
-## Documentation
+## Creating prompt templates in a repository
 
-<Refer to any relevant documentation such as input from a client or online
-documentation for libraries you want to use in the implementation later.>
+Users can also create prompt templates in a prompt template repository.
+They need to navigate to an existing prompt template repository and start the
+creation process from the repository.
 
-## Other considerations
+## Important prompt template details
 
-<Provide other considerations that are relevant to the feature. You can list
-things here that the agent is missing a lot.>
+Each prompt template has at least a title, and content. Optionally users can 
+provide a description and a set of tags for the template. A template is specific
+for one or more products. 
+
+## List of supported products
+
+- Github Copilot
+- Microsoft Copilot
+- Claude Code
+- ChatGPT
+- Claude Chat
