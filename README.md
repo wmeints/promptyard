@@ -37,4 +37,5 @@ DATABASE_URL=<full url to the database>
 
 ## Documentation
 
+- [Product requirements documentation](docs/product)
 - [Architecture documentation](docs/architecture)
