@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, X, Plus } from "lucide-react"
 import Link from "next/link"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { Breadcrumb } from "@/components/molecules/breadcrumb"
 
 export default function NewRepositoryPage() {
   const [title, setTitle] = useState("")

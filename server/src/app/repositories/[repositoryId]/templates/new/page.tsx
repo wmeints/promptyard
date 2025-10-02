@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowLeft, Plus, X, FileText, Tag, AlignLeft, Bot } from "lucide-react"
 import Link from "next/link"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { Breadcrumb } from "@/components/molecules/breadcrumb"
 
 // Mock repository data
 const mockRepository = {

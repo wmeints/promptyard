@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Heart, ThumbsUp, Edit, Code, Copy, Check, MessageCircle, Send } from "lucide-react"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { Breadcrumb } from "@/components/molecules/breadcrumb"
 
 // Mock data for template details
 const mockTemplate = {

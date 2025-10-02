@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, Plus, Search, Heart, ThumbsUp, ChevronLeft, ChevronRight, Code, FileText } from "lucide-react"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { Breadcrumb } from "@/components/molecules/breadcrumb"
 
 // Mock data for repository details
 const mockRepository = {

@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { ArrowLeft, Plus, X, FileText, Tag, AlignLeft, Bot, Check, ChevronsUpDown, FolderOpen } from "lucide-react"
 import Link from "next/link"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { Breadcrumb } from "@/components/molecules/breadcrumb"
 import { cn } from "@/lib/utils"
 
 export default function NewTemplatePage() {

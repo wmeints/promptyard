@@ -1,10 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Heart, ThumbsUp, FileText, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  FileText,
+  Heart,
+  ThumbsUp,
+} from "lucide-react";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 // Mock data for repositories
 const mockRepositories = [
@@ -22,7 +35,8 @@ const mockRepositories = [
   {
     id: 2,
     title: "Code Review & Analysis",
-    description: "Specialized prompts for code review, bug detection, and software architecture analysis.",
+    description:
+      "Specialized prompts for code review, bug detection, and software architecture analysis.",
     favorites: 189,
     upvotes: 423,
     templateCount: 32,
@@ -32,7 +46,8 @@ const mockRepositories = [
   {
     id: 3,
     title: "Data Science Workflows",
-    description: "Prompts for data analysis, visualization suggestions, and statistical interpretation.",
+    description:
+      "Prompts for data analysis, visualization suggestions, and statistical interpretation.",
     favorites: 156,
     upvotes: 298,
     templateCount: 28,
@@ -42,7 +57,8 @@ const mockRepositories = [
   {
     id: 4,
     title: "Marketing & SEO Content",
-    description: "Templates for marketing copy, SEO optimization, and social media content creation.",
+    description:
+      "Templates for marketing copy, SEO optimization, and social media content creation.",
     favorites: 312,
     upvotes: 678,
     templateCount: 52,
@@ -52,7 +68,8 @@ const mockRepositories = [
   {
     id: 5,
     title: "Educational Resources",
-    description: "Prompts for creating lesson plans, educational content, and learning assessments.",
+    description:
+      "Prompts for creating lesson plans, educational content, and learning assessments.",
     favorites: 98,
     upvotes: 187,
     templateCount: 23,
@@ -62,7 +79,8 @@ const mockRepositories = [
   {
     id: 6,
     title: "Business Strategy",
-    description: "Strategic planning prompts, market analysis templates, and business model frameworks.",
+    description:
+      "Strategic planning prompts, market analysis templates, and business model frameworks.",
     favorites: 145,
     upvotes: 289,
     templateCount: 19,
@@ -72,7 +90,8 @@ const mockRepositories = [
   {
     id: 7,
     title: "Creative Design Briefs",
-    description: "Prompts for generating design concepts, color palettes, and creative direction.",
+    description:
+      "Prompts for generating design concepts, color palettes, and creative direction.",
     favorites: 203,
     upvotes: 445,
     templateCount: 37,
@@ -82,7 +101,8 @@ const mockRepositories = [
   {
     id: 8,
     title: "Research & Analysis",
-    description: "Academic research prompts, literature review templates, and analysis frameworks.",
+    description:
+      "Academic research prompts, literature review templates, and analysis frameworks.",
     favorites: 87,
     upvotes: 156,
     templateCount: 15,
@@ -92,7 +112,8 @@ const mockRepositories = [
   {
     id: 9,
     title: "Customer Support Scripts",
-    description: "Professional customer service responses, troubleshooting guides, and support workflows.",
+    description:
+      "Professional customer service responses, troubleshooting guides, and support workflows.",
     favorites: 167,
     upvotes: 334,
     templateCount: 41,
@@ -102,7 +123,8 @@ const mockRepositories = [
   {
     id: 10,
     title: "Project Management",
-    description: "Templates for project planning, team coordination, and milestone tracking.",
+    description:
+      "Templates for project planning, team coordination, and milestone tracking.",
     favorites: 124,
     upvotes: 267,
     templateCount: 26,
@@ -112,7 +134,8 @@ const mockRepositories = [
   {
     id: 11,
     title: "Legal Document Drafting",
-    description: "Professional legal templates, contract analysis, and compliance checking prompts.",
+    description:
+      "Professional legal templates, contract analysis, and compliance checking prompts.",
     favorites: 78,
     upvotes: 145,
     templateCount: 18,
@@ -122,36 +145,37 @@ const mockRepositories = [
   {
     id: 12,
     title: "Financial Analysis",
-    description: "Financial modeling prompts, investment analysis, and budget planning templates.",
+    description:
+      "Financial modeling prompts, investment analysis, and budget planning templates.",
     favorites: 156,
     upvotes: 298,
     templateCount: 22,
     lastUpdated: "5 days ago",
     tags: ["Finance", "Analysis", "Investment"],
   },
-]
+];
 
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 10;
 
 export function RepositoryList() {
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(mockRepositories.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const endIndex = startIndex + ITEMS_PER_PAGE
-  const currentRepositories = mockRepositories.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(mockRepositories.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentRepositories = mockRepositories.slice(startIndex, endIndex);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   return (
     <div>
@@ -162,8 +186,12 @@ export function RepositoryList() {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-lg mb-2 text-balance">{repo.title}</CardTitle>
-                  <CardDescription className="text-pretty">{repo.description}</CardDescription>
+                  <CardTitle className="text-lg mb-2 text-balance">
+                    {repo.title}
+                  </CardTitle>
+                  <CardDescription className="text-pretty">
+                    {repo.description}
+                  </CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" className="ml-2">
                   <ExternalLink className="h-4 w-4" />
@@ -207,8 +235,8 @@ export function RepositoryList() {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {startIndex + 1}-{Math.min(endIndex, mockRepositories.length)} of {mockRepositories.length}{" "}
-          repositories
+          Showing {startIndex + 1}-{Math.min(endIndex, mockRepositories.length)}{" "}
+          of {mockRepositories.length} repositories
         </div>
 
         <div className="flex items-center gap-2">
@@ -250,5 +278,5 @@ export function RepositoryList() {
         </div>
       </div>
     </div>
-  )
+  );
 }

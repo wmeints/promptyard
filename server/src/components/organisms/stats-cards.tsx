@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GitBranch, Heart, ThumbsUp, TrendingUp } from "lucide-react"
+import { GitBranch, Heart, ThumbsUp, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function StatsCards() {
   const stats = [
@@ -31,26 +31,32 @@ export function StatsCards() {
       icon: TrendingUp,
       trend: "+2.1% this month",
     },
-  ]
+  ];
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {stats.map((stat, index) => {
-        const Icon = stat.icon
+      {stats.map((stat) => {
+        const Icon = stat.icon;
         return (
-          <Card key={index} className="hover:shadow-md transition-shadow">
+          <Card key={stat.title} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground mb-1">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mb-2">{stat.description}</p>
+              <div className="text-2xl font-bold text-foreground mb-1">
+                {stat.value}
+              </div>
+              <p className="text-xs text-muted-foreground mb-2">
+                {stat.description}
+              </p>
               <p className="text-xs text-accent font-medium">{stat.trend}</p>
             </CardContent>
           </Card>
-        )
+        );
       })}
     </section>
-  )
+  );
 }
