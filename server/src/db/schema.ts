@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgTable,
   text,
@@ -8,42 +9,80 @@ import {
 } from "drizzle-orm/pg-core";
 
 const timestamps = {
-  createdAt: timestamp().notNull(),
-  modifiedAt: timestamp(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 };
 
-export const usersTable = pgTable(
-  "users",
-  {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    externalId: varchar({ length: 500 }).notNull(),
-    version: integer().notNull().default(1),
-    ...timestamps,
-  },
-  (table) => [unique().on(table.externalId)],
-);
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  ...timestamps,
+});
 
-export const repositoriesTable = pgTable("repositories", {
+export const session = pgTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  ...timestamps,
+});
+
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  ...timestamps,
+});
+
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  ...timestamps,
+});
+
+export const repository = pgTable("repositories", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 500 }).notNull(),
   slug: varchar({ length: 500 }).notNull(),
   description: text(),
-  ownerId: integer().references(() => usersTable.id),
+  ownerId: text().references(() => user.id),
   version: integer().notNull().default(1),
   ...timestamps,
 });
 
-export const promptTemplatesTable = pgTable("prompt_templates", {
+export const promptTemplate = pgTable("prompt_templates", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   slug: varchar({ length: 500 }).notNull(),
-  repositoryId: integer().references(() => repositoriesTable.id),
+  repositoryId: integer().references(() => repository.id),
   version: integer().notNull().default(1),
   ...timestamps,
 });
 
-export const promptTemplateVersionsTable = pgTable("prompt_template_versions", {
+export const promptTemplateVersion = pgTable("prompt_template_versions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  promptTemplateId: integer().references(() => promptTemplatesTable.id),
+  promptTemplateId: integer().references(() => promptTemplate.id),
   version: integer(),
   description: text(),
   content: text(),
