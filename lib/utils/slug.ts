@@ -10,13 +10,20 @@
  * @returns A URL-friendly slug
  */
 export function generateSlug(title: string): string {
-  return title
+  // First, normalize the string
+  let slug = title
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .replace(/-+/g, '-') // Replace multiple dashes with single dash
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
+    .replace(/[^\w\s-]/g, '') // Remove special characters (keep word chars, spaces, and dashes)
+    .replace(/\s+/g, '-'); // Replace spaces with dashes
+  
+  // Remove consecutive dashes without regex to avoid ReDoS
+  while (slug.includes('--')) {
+    slug = slug.replace('--', '-');
+  }
+  
+  // Remove leading/trailing dashes
+  return slug.replace(/^-+/, '').replace(/-+$/, '');
 }
 
 /**
