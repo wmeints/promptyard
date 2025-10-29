@@ -8,3 +8,6 @@ export * from './prompts';
 
 // Authentication schema - Better Auth tables
 export * from './auth';
+
+// Collections schema - for grouping related prompts
+export * from './collections';
