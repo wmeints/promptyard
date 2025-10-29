@@ -32,7 +32,7 @@ async function createTestUser(id = 'test-user-id', email = 'test@example.com', n
   return testUser;
 }
 
-async function getAllExistingSlugs(): Promise<string[]> {
+async function fetchAllExistingSlugs(): Promise<string[]> {
   const existingPrompts = await db
     .select({ slug: prompts.slug })
     .from(prompts);
@@ -61,7 +61,7 @@ async function testSlugUniqueness() {
   console.log(`✓ Created first prompt with slug: "${prompt1.slug}"`);
   
   // Create second prompt with same title
-  const existingSlugs = await getAllExistingSlugs();
+  const existingSlugs = await fetchAllExistingSlugs();
   const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
   
   const [prompt2] = await db
@@ -77,7 +77,7 @@ async function testSlugUniqueness() {
   console.log(`✓ Created second prompt with slug: "${prompt2.slug}"`);
   
   // Create third prompt with same title
-  const existingSlugs2 = await getAllExistingSlugs();
+  const existingSlugs2 = await fetchAllExistingSlugs();
   const uniqueSlug2 = generateUniqueSlug(baseSlug, existingSlugs2);
   
   const [prompt3] = await db
