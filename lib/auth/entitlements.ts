@@ -5,7 +5,7 @@
 
 import { db } from '../db/connection';
 import { prompts, collections, userPromptRoles, userCollectionRoles, promptCollections } from '../db/schema/prompts';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 /**
  * Permission types that can be checked
