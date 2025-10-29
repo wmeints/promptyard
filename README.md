@@ -78,11 +78,13 @@ Replace `username` and `password` with your PostgreSQL credentials.
 
 ### 5. Run Database Migrations
 
+Set up the database schema using Drizzle Kit:
+
 ```bash
-npm run db:push
+npx drizzle-kit push
 ```
 
-*Note: If this command doesn't exist yet, you may need to set up migrations manually using Drizzle Kit.*
+This command will create the necessary tables and schema in your PostgreSQL database.
 
 ### 6. Start the Development Server
 
@@ -157,6 +159,4 @@ Contributions are welcome! Please ensure your code:
 - Follows the existing code style
 - Passes all linting and build checks
 
-## License
 
-This project is private and proprietary.
