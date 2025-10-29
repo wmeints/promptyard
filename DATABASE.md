@@ -17,7 +17,7 @@ This project uses [Drizzle ORM](https://orm.drizzle.team/) with PostgreSQL for d
 2. **Configure your database URL:**
    Edit `.env` and set your PostgreSQL connection string:
    ```
-   DATABASE_URL=postgresql://username:password@localhost:5432/promptyard
+   DATABASE_URL=postgresql://your_username:your_password@localhost:5432/promptyard
    ```
 
 3. **Install dependencies** (if not already done):
