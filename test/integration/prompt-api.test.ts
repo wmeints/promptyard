@@ -17,19 +17,26 @@ async function cleanupTestData() {
   console.log('✓ Test data cleaned up');
 }
 
-async function createTestUser() {
+async function createTestUser(id = 'test-user-id', email = 'test@example.com', name = 'Test User') {
   console.log('\nCreating test user...');
   const [testUser] = await db
     .insert(user)
     .values({
-      id: 'test-user-id',
-      name: 'Test User',
-      email: 'test@example.com',
+      id,
+      name,
+      email,
       emailVerified: true,
     })
     .returning();
   console.log('✓ Test user created:', testUser.email);
   return testUser;
+}
+
+async function getAllExistingSlugs(): Promise<string[]> {
+  const existingPrompts = await db
+    .select({ slug: prompts.slug })
+    .from(prompts);
+  return existingPrompts.map(p => p.slug);
 }
 
 async function testSlugUniqueness() {
@@ -54,11 +61,7 @@ async function testSlugUniqueness() {
   console.log(`✓ Created first prompt with slug: "${prompt1.slug}"`);
   
   // Create second prompt with same title
-  const existingPrompts = await db
-    .select({ slug: prompts.slug })
-    .from(prompts);
-  
-  const existingSlugs = existingPrompts.map(p => p.slug);
+  const existingSlugs = await getAllExistingSlugs();
   const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
   
   const [prompt2] = await db
@@ -74,11 +77,7 @@ async function testSlugUniqueness() {
   console.log(`✓ Created second prompt with slug: "${prompt2.slug}"`);
   
   // Create third prompt with same title
-  const existingPrompts2 = await db
-    .select({ slug: prompts.slug })
-    .from(prompts);
-  
-  const existingSlugs2 = existingPrompts2.map(p => p.slug);
+  const existingSlugs2 = await getAllExistingSlugs();
   const uniqueSlug2 = generateUniqueSlug(baseSlug, existingSlugs2);
   
   const [prompt3] = await db
@@ -160,16 +159,7 @@ async function testUserPrompts() {
   console.log('\n=== Testing user-specific prompts ===');
   
   const testUser1 = await createTestUser();
-  
-  const [testUser2] = await db
-    .insert(user)
-    .values({
-      id: 'test-user-id-2',
-      name: 'Test User 2',
-      email: 'test2@example.com',
-      emailVerified: true,
-    })
-    .returning();
+  const testUser2 = await createTestUser('test-user-id-2', 'test2@example.com', 'Test User 2');
   
   // Create prompts for user 1
   await db.insert(prompts).values([
