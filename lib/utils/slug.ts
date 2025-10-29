@@ -22,8 +22,17 @@ export function generateSlug(title: string): string {
     slug = slug.replace('--', '-');
   }
   
-  // Remove leading/trailing dashes
-  return slug.replace(/^-+/, '').replace(/-+$/, '');
+  // Remove leading dashes
+  while (slug.startsWith('-')) {
+    slug = slug.slice(1);
+  }
+  
+  // Remove trailing dashes
+  while (slug.endsWith('-')) {
+    slug = slug.slice(0, -1);
+  }
+  
+  return slug;
 }
 
 /**
