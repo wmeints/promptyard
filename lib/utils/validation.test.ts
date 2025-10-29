@@ -36,7 +36,7 @@ describe('validation utilities', () => {
         '',
         'not-a-url',
         'http://localhost:5432/database',
-        'postgres://localhost:5432/database', // Wrong protocol
+        'postgres://localhost:5432/database', // This validation requires 'postgresql://' specifically
       ];
 
       invalidUrls.forEach((url) => {
