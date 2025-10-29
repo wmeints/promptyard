@@ -1,6 +1,6 @@
 /**
  * Login form component
- * Provides username/email and password authentication
+ * Provides email and password authentication
  */
 
 'use client';
