@@ -5,9 +5,10 @@
 
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { getDatabaseConfig } from './config';
+import * as schema from './schema';
 
 /**
  * Database instance configured with Drizzle ORM
  * Uses node-postgres (pg) as the underlying driver
  */
-export const db = drizzle(getDatabaseConfig().url);
+export const db = drizzle(getDatabaseConfig().url, { schema });
