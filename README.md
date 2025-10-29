@@ -24,12 +24,19 @@ Before you begin, ensure you have the following installed on your system:
 
 - **Node.js** - Version 20.x or higher ([Download](https://nodejs.org/))
 - **npm** - Version 10.x or higher (comes with Node.js)
-- **PostgreSQL** - Version 14 or higher ([Download](https://www.postgresql.org/download/))
+- **Docker & Docker Compose** (Recommended) - For easy PostgreSQL setup ([Download](https://docs.docker.com/get-docker/))
+  - *OR* **PostgreSQL** - Version 14 or higher if not using Docker ([Download](https://www.postgresql.org/download/))
 
 You can verify your installations by running:
 ```bash
 node --version
 npm --version
+
+# If using Docker
+docker --version
+docker-compose --version
+
+# If using local PostgreSQL
 psql --version
 ```
 
@@ -50,7 +57,26 @@ npm install
 
 ### 3. Set Up the Database
 
-Create a PostgreSQL database for the application:
+#### Option A: Using Docker (Recommended)
+
+The easiest way to set up PostgreSQL is using Docker Compose:
+
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Start PostgreSQL in the background
+docker-compose up -d
+
+# Verify the database is running
+docker-compose ps
+```
+
+The default credentials are already configured in `.env.example`. The database will be accessible at `localhost:5432`.
+
+#### Option B: Using an Existing PostgreSQL Installation
+
+If you have PostgreSQL installed locally:
 
 ```bash
 # Connect to PostgreSQL
@@ -60,23 +86,19 @@ psql -U postgres
 CREATE DATABASE promptyard;
 ```
 
-### 4. Configure Environment Variables
+Then create a `.env` file:
 
-Create a `.env.local` file in the root directory with the following variables:
-
-```env
-# Required: PostgreSQL connection string
-DATABASE_URL=postgresql://username:password@localhost:5432/promptyard
-
-# Optional: Database connection pool settings (defaults shown)
-DB_MAX_CONNECTIONS=20
-DB_CONNECTION_TIMEOUT=30000
-DB_IDLE_TIMEOUT=10000
+```bash
+cp .env.example .env
 ```
 
-Replace `username` and `password` with your PostgreSQL credentials.
+Update the `DATABASE_URL` in `.env` with your PostgreSQL credentials:
 
-### 5. Run Database Migrations
+```env
+DATABASE_URL=postgresql://your_username:your_password@localhost:5432/promptyard
+```
+
+### 4. Run Database Migrations
 
 Set up the database schema using Drizzle Kit:
 
@@ -86,7 +108,7 @@ npx drizzle-kit push
 
 This command will create the necessary tables and schema in your PostgreSQL database.
 
-### 6. Start the Development Server
+### 5. Start the Development Server
 
 ```bash
 npm run dev
@@ -98,10 +120,17 @@ The page will automatically reload when you make changes to the code.
 
 ## Available Scripts
 
+### Development
 - `npm run dev` - Start the development server on port 3000
 - `npm run build` - Create an optimized production build
 - `npm run start` - Start the production server
 - `npm run lint` - Run ESLint to check code quality
+
+### Docker Commands (if using Docker)
+- `docker-compose up -d` - Start PostgreSQL in the background
+- `docker-compose down` - Stop PostgreSQL
+- `docker-compose logs -f postgres` - View PostgreSQL logs
+- `docker-compose ps` - Check container status
 
 ## Project Structure
 
