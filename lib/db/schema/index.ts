@@ -5,3 +5,6 @@
 
 // Example schema - demonstrates how to define tables
 export * from './prompts';
+
+// Authentication schema - Better Auth tables
+export * from './auth';
