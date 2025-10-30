@@ -17,6 +17,8 @@ A TypeScript-based web application that helps users store, organize, and share t
 - **[PostgreSQL](https://www.postgresql.org/)** - Relational database
 - **[BetterAuth](https://www.better-auth.com/)** - Authentication solution
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Vitest](https://vitest.dev/)** - Unit testing framework
+- **[Storybook](https://storybook.js.org/)** - Component development and testing
 
 ## System Requirements
 
@@ -126,6 +128,21 @@ The page will automatically reload when you make changes to the code.
 - `npm run start` - Start the production server
 - `npm run lint` - Run ESLint to check code quality
 
+### Testing
+- `npm run test` - Run unit tests with Vitest
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Generate test coverage report
+
+### Storybook
+- `npm run storybook` - Start Storybook development server on port 6006
+- `npm run build-storybook` - Build Storybook for production
+
+### Database
+- `npm run db:generate` - Generate database migrations
+- `npm run db:migrate` - Run database migrations
+- `npm run db:push` - Push schema changes to database
+- `npm run db:studio` - Open Drizzle Studio for database management
+
 ### Docker Commands (if using Docker)
 - `docker-compose up -d` - Start PostgreSQL in the background
 - `docker-compose down` - Stop PostgreSQL
@@ -161,6 +178,35 @@ This project follows strict quality guidelines:
 - ✅ Every component has a Storybook file for testing
 - ✅ TypeScript files include unit tests
 - ✅ Important user scenarios are covered by Playwright tests
+
+### Component Development with Storybook
+
+Storybook is used for component development and testing. To work with Storybook:
+
+1. **Start Storybook**: Run `npm run storybook` to start the Storybook dev server
+2. **View Components**: Open [http://localhost:6006](http://localhost:6006) in your browser
+3. **Create Stories**: Add `.stories.tsx` files next to your components in the `components/` or `app/` directories
+
+Example story structure:
+```typescript
+// components/MyComponent.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import { MyComponent } from './MyComponent';
+
+const meta: Meta<typeof MyComponent> = {
+  title: 'Components/MyComponent',
+  component: MyComponent,
+};
+
+export default meta;
+type Story = StoryObj<typeof MyComponent>;
+
+export const Default: Story = {
+  args: {
+    // component props
+  },
+};
+```
 
 ## Learn More
 
