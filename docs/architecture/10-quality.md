@@ -1,14 +1,15 @@
-# Testing Guide
+# Quality Assurance
 
-This project uses [Vitest](https://vitest.dev/) for unit testing.
+This document describes our approach to maintaining code quality through testing.
 
-## Running Tests
+## Unit Testing
+
+We use [Vitest](https://vitest.dev/) as our unit testing framework. Vitest is a modern, fast test runner that integrates well with our TypeScript and Next.js stack.
+
+### Running Tests
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode (default for vitest)
+# Run all tests in watch mode
 npm test
 
 # Run tests once (useful for CI)
@@ -21,19 +22,7 @@ npm run test:ui
 npm run test:coverage
 ```
 
-## Mock Configuration
-
-Vitest is configured to automatically reset mocks after each test. The following settings are enabled in `vitest.config.ts`:
-
-- `mockReset: true` - Resets all mocks after each test
-- `restoreMocks: true` - Restores original implementations after each test
-- `clearMocks: true` - Clears mock call history after each test
-- `unstubEnvs: true` - Unstubs environment variables after each test
-- `unstubGlobals: true` - Unstubs global variables after each test
-
-This means you don't need to manually reset mocks in your tests - they will be automatically cleaned up after each test case.
-
-## Writing Tests
+### Writing Tests
 
 Test files should be placed next to the files they test with the `.test.ts` or `.test.tsx` extension.
 
@@ -59,6 +48,18 @@ describe('myFunction', () => {
 });
 ```
 
+### Mock Configuration
+
+Vitest is configured to automatically reset mocks after each test. The following settings are enabled in `vitest.config.ts`:
+
+- `mockReset: true` - Resets all mocks after each test
+- `restoreMocks: true` - Restores original implementations after each test
+- `clearMocks: true` - Clears mock call history after each test
+- `unstubEnvs: true` - Unstubs environment variables after each test
+- `unstubGlobals: true` - Unstubs global variables after each test
+
+This means you don't need to manually reset mocks in your tests - they will be automatically cleaned up after each test case.
+
 ### Using Mocks
 
 ```typescript
@@ -79,7 +80,7 @@ describe('mock example', () => {
 });
 ```
 
-## Testing React Components
+### Testing React Components
 
 The project is configured with `@testing-library/react` for component testing.
 
@@ -96,7 +97,7 @@ describe('MyComponent', () => {
 });
 ```
 
-## Path Aliases
+### Path Aliases
 
 The `@/` path alias is configured to resolve to the project root, matching the Next.js configuration:
 
@@ -104,8 +105,16 @@ The `@/` path alias is configured to resolve to the project root, matching the N
 import { myUtil } from '@/lib/utils/myUtil';
 ```
 
-## Configuration Files
+### Configuration Files
 
 - `vitest.config.ts` - Main Vitest configuration
 - `vitest.setup.ts` - Setup file that runs before tests
 - `tsconfig.json` - TypeScript configuration with Vitest types
+
+## Component Testing
+
+Every component must have a storybook file to test the component in isolation.
+
+## End-to-End Testing
+
+Important scenarios must have playwright tests to verify they work correctly in a real browser environment.
