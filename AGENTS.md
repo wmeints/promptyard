@@ -24,4 +24,6 @@ and share them with friends and colleagues.
 - Typescript files must have a set of unit-tests to verify the code
 - Important scenarios must have playwright tests to verify they work
 
+For more information on our testing approach, see [Quality Assurance](docs/architecture/10-quality.md).
+
 
