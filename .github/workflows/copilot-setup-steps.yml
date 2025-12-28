@@ -31,3 +31,9 @@ jobs:
       - name: Restore portal dependencies
         working-directory: ./portal
         run: bun install
+
+      # Verify installations
+      - name: Verify installations
+        run: |
+          echo "Bun version: $(bun --version)"
+          echo ".NET version: $(dotnet --version)"
