@@ -6,6 +6,7 @@ import {
     index,
     boolean,
     varchar,
+    primaryKey,
 } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
@@ -14,7 +15,7 @@ export const agent = pgTable(
     "agent",
     {
         id: varchar("id", { length: 36 }).primaryKey(),
-        name: text("name").notNull(),
+        name: varchar("name", { length: 255 }).notNull(),
         description: text("description"),
         path: text("path").notNull(),
         repositoryId: varchar("repository_id", { length: 36 })
@@ -50,6 +51,7 @@ export const agentTag = pgTable(
             .references(() => tag.id, { onDelete: "cascade" }),
     },
     (table) => [
+        primaryKey({ columns: [table.agentId, table.tagId] }),
         index("agent_tag_agentId_idx").on(table.agentId),
         index("agent_tag_tagId_idx").on(table.tagId),
     ]

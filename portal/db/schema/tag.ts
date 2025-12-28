@@ -7,7 +7,7 @@ import { agentTag } from "./agent";
 
 export const tag = pgTable("tag", {
     id: varchar("id", { length: 36 }).primaryKey(),
-    name: text("name").notNull().unique(),
+    name: varchar("name", { length: 100 }).notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
         .defaultNow()

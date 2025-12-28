@@ -13,8 +13,8 @@ import { repositoryMember } from "./repository-member";
 
 export const user = pgTable("user", {
     id: varchar("id", { length: 36 }).primaryKey(),
-    name: text("name").notNull(),
-    email: text("email").notNull().unique(),
+    name: varchar("name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     image: text("image"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
