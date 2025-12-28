@@ -149,6 +149,64 @@ export const agent = pgTable(
     (table) => [index("agent_repositoryId_idx").on(table.repositoryId)]
 );
 
+export const tag = pgTable("tag", {
+    id: text("id").primaryKey(),
+    name: text("name").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+        .defaultNow()
+        .$onUpdate(() => /* @__PURE__ */ new Date())
+        .notNull(),
+});
+
+export const promptTag = pgTable(
+    "prompt_tag",
+    {
+        promptId: text("prompt_id")
+            .notNull()
+            .references(() => prompt.id, { onDelete: "cascade" }),
+        tagId: text("tag_id")
+            .notNull()
+            .references(() => tag.id, { onDelete: "cascade" }),
+    },
+    (table) => [
+        index("prompt_tag_promptId_idx").on(table.promptId),
+        index("prompt_tag_tagId_idx").on(table.tagId),
+    ]
+);
+
+export const skillTag = pgTable(
+    "skill_tag",
+    {
+        skillId: text("skill_id")
+            .notNull()
+            .references(() => skill.id, { onDelete: "cascade" }),
+        tagId: text("tag_id")
+            .notNull()
+            .references(() => tag.id, { onDelete: "cascade" }),
+    },
+    (table) => [
+        index("skill_tag_skillId_idx").on(table.skillId),
+        index("skill_tag_tagId_idx").on(table.tagId),
+    ]
+);
+
+export const agentTag = pgTable(
+    "agent_tag",
+    {
+        agentId: text("agent_id")
+            .notNull()
+            .references(() => agent.id, { onDelete: "cascade" }),
+        tagId: text("tag_id")
+            .notNull()
+            .references(() => tag.id, { onDelete: "cascade" }),
+    },
+    (table) => [
+        index("agent_tag_agentId_idx").on(table.agentId),
+        index("agent_tag_tagId_idx").on(table.tagId),
+    ]
+);
+
 export const userRelations = relations(user, ({ many }) => ({
     sessions: many(session),
     accounts: many(account),
@@ -179,23 +237,65 @@ export const repositoryRelations = relations(repository, ({ one, many }) => ({
     agents: many(agent),
 }));
 
-export const promptRelations = relations(prompt, ({ one }) => ({
+export const promptRelations = relations(prompt, ({ one, many }) => ({
     repository: one(repository, {
         fields: [prompt.repositoryId],
         references: [repository.id],
     }),
+    promptTags: many(promptTag),
 }));
 
-export const skillRelations = relations(skill, ({ one }) => ({
+export const skillRelations = relations(skill, ({ one, many }) => ({
     repository: one(repository, {
         fields: [skill.repositoryId],
         references: [repository.id],
     }),
+    skillTags: many(skillTag),
 }));
 
-export const agentRelations = relations(agent, ({ one }) => ({
+export const agentRelations = relations(agent, ({ one, many }) => ({
     repository: one(repository, {
         fields: [agent.repositoryId],
         references: [repository.id],
+    }),
+    agentTags: many(agentTag),
+}));
+
+export const tagRelations = relations(tag, ({ many }) => ({
+    promptTags: many(promptTag),
+    skillTags: many(skillTag),
+    agentTags: many(agentTag),
+}));
+
+export const promptTagRelations = relations(promptTag, ({ one }) => ({
+    prompt: one(prompt, {
+        fields: [promptTag.promptId],
+        references: [prompt.id],
+    }),
+    tag: one(tag, {
+        fields: [promptTag.tagId],
+        references: [tag.id],
+    }),
+}));
+
+export const skillTagRelations = relations(skillTag, ({ one }) => ({
+    skill: one(skill, {
+        fields: [skillTag.skillId],
+        references: [skill.id],
+    }),
+    tag: one(tag, {
+        fields: [skillTag.tagId],
+        references: [tag.id],
+    }),
+}));
+
+export const agentTagRelations = relations(agentTag, ({ one }) => ({
+    agent: one(agent, {
+        fields: [agentTag.agentId],
+        references: [agent.id],
+    }),
+    tag: one(tag, {
+        fields: [agentTag.tagId],
+        references: [tag.id],
     }),
 }));
