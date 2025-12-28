@@ -7,10 +7,23 @@ var builder = DistributedApplication.CreateBuilder(args);
 var databaseServer = builder.AddPostgres("postgres").WithDataVolume();
 var applicationDatabase = databaseServer.AddDatabase("database", "promptyard");
 
+var authSecretKey = builder.AddParameter("authSecretKey", secret: true);
+var authPublicUrl = builder.AddParameter("publicAuthUrl", "http://localhost:3000");
+
+// This script initializes the database for the portal application.
+// The portal application will wait for this script to complete before starting.
+var portalInitScript = builder.AddBunApp("portal-init", "../portal", "push-db")
+    .WithReference(applicationDatabase)
+    .WaitFor(applicationDatabase);
+
 builder.AddBunApp("portal", "../portal", "dev")
+    .WithEnvironment("BETTER_AUTH_SECRET", authSecretKey)
+    .WithEnvironment("BETTER_AUTH_URL", authPublicUrl)
     .WithReference(applicationDatabase)
     .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
-    .WaitFor(applicationDatabase);
+    .WaitFor(applicationDatabase)
+    .WaitForCompletion(portalInitScript);
+
 
 builder.Build().Run();
