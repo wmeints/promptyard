@@ -1,17 +1,24 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
+import {
+    pgTable,
+    text,
+    timestamp,
+    index,
+    boolean,
+    varchar,
+} from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
 
 export const skill = pgTable(
     "skill",
     {
-        id: text("id").primaryKey(),
+        id: varchar("id", { length: 36 }).primaryKey(),
         title: text("title").notNull(),
         description: text("description"),
         path: text("path").notNull(),
         isPublic: boolean("is_public").default(false).notNull(),
-        repositoryId: text("repository_id")
+        repositoryId: varchar("repository_id", { length: 36 })
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
         createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -34,10 +41,10 @@ export const skillRelations = relations(skill, ({ one, many }) => ({
 export const skillTag = pgTable(
     "skill_tag",
     {
-        skillId: text("skill_id")
+        skillId: varchar("skill_id", { length: 36 })
             .notNull()
             .references(() => skill.id, { onDelete: "cascade" }),
-        tagId: text("tag_id")
+        tagId: varchar("tag_id", { length: 36 })
             .notNull()
             .references(() => tag.id, { onDelete: "cascade" }),
     },

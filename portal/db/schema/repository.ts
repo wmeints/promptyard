@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import {
+    pgTable,
+    text,
+    timestamp,
+    boolean,
+    index,
+    varchar,
+} from "drizzle-orm/pg-core";
 import { user } from "./user";
 
 import { prompt } from "./prompt";
@@ -10,10 +17,10 @@ import { repositoryMember } from "./repository-member";
 export const repository = pgTable(
     "repository",
     {
-        id: text("id").primaryKey(),
+        id: varchar("id", { length: 36 }).primaryKey(),
         name: text("name").notNull(),
         description: text("description"),
-        userId: text("user_id")
+        userId: varchar("user_id", { length: 36 })
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
         isPublic: boolean("is_public").default(false).notNull(),

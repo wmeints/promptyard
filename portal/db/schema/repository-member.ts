@@ -16,10 +16,10 @@ export type RepositoryMemberRole = (typeof repositoryMemberRole)[number];
 export const repositoryMember = pgTable(
     "repository_member",
     {
-        repositoryId: text("repository_id")
+        repositoryId: varchar("repository_id", { length: 36 })
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
-        userId: text("user_id")
+        userId: varchar("user_id", { length: 36 })
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
         role: varchar("role", {

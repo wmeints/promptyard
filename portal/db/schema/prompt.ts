@@ -1,16 +1,23 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
+import {
+    pgTable,
+    text,
+    timestamp,
+    index,
+    boolean,
+    varchar,
+} from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
 
 export const prompt = pgTable(
     "prompt",
     {
-        id: text("id").primaryKey(),
+        id: varchar("id", { length: 36 }).primaryKey(),
         title: text("title").notNull(),
         description: text("description"),
         content: text("content").notNull(),
-        repositoryId: text("repository_id")
+        repositoryId: varchar("repository_id", { length: 36 })
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
         isPublic: boolean("is_public").default(false).notNull(),
@@ -34,10 +41,10 @@ export const promptRelations = relations(prompt, ({ one, many }) => ({
 export const promptTag = pgTable(
     "prompt_tag",
     {
-        promptId: text("prompt_id")
+        promptId: varchar("prompt_id", { length: 36 })
             .notNull()
             .references(() => prompt.id, { onDelete: "cascade" }),
-        tagId: text("tag_id")
+        tagId: varchar("tag_id", { length: 36 })
             .notNull()
             .references(() => tag.id, { onDelete: "cascade" }),
     },
