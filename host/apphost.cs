@@ -4,7 +4,7 @@
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var databaseServer = builder.AddPostgres("postgres").WithDataVolume();
+var databaseServer = builder.AddPostgres("postgres").WithDataVolume().WithPgWeb();
 var applicationDatabase = databaseServer.AddDatabase("database", "promptyard");
 
 var authSecretKey = builder.AddParameter("authSecretKey", secret: true);
