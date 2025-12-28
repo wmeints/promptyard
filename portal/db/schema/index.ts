@@ -3,6 +3,7 @@ export * from "./session";
 export * from "./account";
 export * from "./verification";
 export * from "./repository";
+export * from "./repository-member";
 export * from "./prompt";
 export * from "./skill";
 export * from "./agent";

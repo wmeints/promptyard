@@ -5,6 +5,7 @@ import { user } from "./user";
 import { prompt } from "./prompt";
 import { skill } from "./skill";
 import { agent } from "./agent";
+import { repositoryMember } from "./repository-member";
 
 export const repository = pgTable(
     "repository",
@@ -33,4 +34,5 @@ export const repositoryRelations = relations(repository, ({ one, many }) => ({
     prompts: many(prompt),
     skills: many(skill),
     agents: many(agent),
+    members: many(repositoryMember),
 }));
