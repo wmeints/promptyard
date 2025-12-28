@@ -92,6 +92,25 @@ export const repository = pgTable(
   (table) => [index("repository_userId_idx").on(table.userId)]
 );
 
+export const promptTable = pgTable(
+  "prompt",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    description: text("description"),
+    content: text("content").notNull(),
+    repositoryId: text("repository_id")
+      .notNull()
+      .references(() => repository.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("prompt_repositoryId_idx").on(table.repositoryId)]
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
@@ -112,9 +131,17 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-export const repositoryRelations = relations(repository, ({ one }) => ({
+export const repositoryRelations = relations(repository, ({ one, many }) => ({
   user: one(user, {
     fields: [repository.userId],
     references: [user.id],
+  }),
+  prompts: many(promptTable),
+}));
+
+export const promptRelations = relations(promptTable, ({ one }) => ({
+  repository: one(repository, {
+    fields: [promptTable.repositoryId],
+    references: [repository.id],
   }),
 }));
