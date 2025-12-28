@@ -92,7 +92,7 @@ export const repository = pgTable(
     (table) => [index("repository_userId_idx").on(table.userId)]
 );
 
-export const promptTable = pgTable(
+export const prompt = pgTable(
     "prompt",
     {
         id: text("id").primaryKey(),
@@ -111,7 +111,7 @@ export const promptTable = pgTable(
     (table) => [index("prompt_repositoryId_idx").on(table.repositoryId)]
 );
 
-export const skillTable = pgTable(
+export const skill = pgTable(
     "skill",
     {
         id: text("id").primaryKey(),
@@ -128,6 +128,25 @@ export const skillTable = pgTable(
             .notNull(),
     },
     (table) => [index("skill_repositoryId_idx").on(table.repositoryId)]
+);
+
+export const agent = pgTable(
+    "agent",
+    {
+        id: text("id").primaryKey(),
+        name: text("name").notNull(),
+        description: text("description"),
+        instructions: text("instructions").notNull(),
+        repositoryId: text("repository_id")
+            .notNull()
+            .references(() => repository.id, { onDelete: "cascade" }),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at")
+            .defaultNow()
+            .$onUpdate(() => /* @__PURE__ */ new Date())
+            .notNull(),
+    },
+    (table) => [index("agent_repositoryId_idx").on(table.repositoryId)]
 );
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -155,20 +174,28 @@ export const repositoryRelations = relations(repository, ({ one, many }) => ({
         fields: [repository.userId],
         references: [user.id],
     }),
-    prompts: many(promptTable),
-    skills: many(skillTable),
+    prompts: many(prompt),
+    skills: many(skill),
+    agents: many(agent),
 }));
 
-export const promptRelations = relations(promptTable, ({ one }) => ({
+export const promptRelations = relations(prompt, ({ one }) => ({
     repository: one(repository, {
-        fields: [promptTable.repositoryId],
+        fields: [prompt.repositoryId],
         references: [repository.id],
     }),
 }));
 
-export const skillRelations = relations(skillTable, ({ one }) => ({
+export const skillRelations = relations(skill, ({ one }) => ({
     repository: one(repository, {
-        fields: [skillTable.repositoryId],
+        fields: [skill.repositoryId],
+        references: [repository.id],
+    }),
+}));
+
+export const agentRelations = relations(agent, ({ one }) => ({
+    repository: one(repository, {
+        fields: [agent.repositoryId],
         references: [repository.id],
     }),
 }));
