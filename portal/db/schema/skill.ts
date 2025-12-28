@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
 
@@ -10,6 +10,7 @@ export const skill = pgTable(
         title: text("title").notNull(),
         description: text("description"),
         path: text("path").notNull(),
+        isPublic: boolean("is_public").default(false).notNull(),
         repositoryId: text("repository_id")
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),

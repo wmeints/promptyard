@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
 
@@ -13,6 +13,7 @@ export const prompt = pgTable(
         repositoryId: text("repository_id")
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
+        isPublic: boolean("is_public").default(false).notNull(),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at")
             .defaultNow()
