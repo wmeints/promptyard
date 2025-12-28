@@ -24,8 +24,6 @@ jobs:
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.0.1
-        with:
-          bun-version-file: portal/package.json
       
       - name: Cache Playwright browsers
         uses: actions/cache@v4
