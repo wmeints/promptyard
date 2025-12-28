@@ -17,6 +17,7 @@ export const agent = pgTable(
     {
         id: varchar("id", { length: 36 }).primaryKey(),
         name: varchar("name", { length: 255 }).notNull(),
+        slug: varchar("slug", { length: 255 }).notNull(),
         description: text("description"),
         path: text("path").notNull(),
         repositoryId: varchar("repository_id", { length: 36 })

@@ -17,6 +17,7 @@ export const prompt = pgTable(
     {
         id: varchar("id", { length: 36 }).primaryKey(),
         title: varchar("title", { length: 500 }).notNull(),
+        slug: varchar("slug", { length: 255 }).notNull(),
         description: text("description"),
         content: text("content").notNull(),
         repositoryId: varchar("repository_id", { length: 36 })

@@ -17,6 +17,7 @@ export const skill = pgTable(
     {
         id: varchar("id", { length: 36 }).primaryKey(),
         title: varchar("title", { length: 500 }).notNull(),
+        slug: varchar("slug", { length: 255 }).notNull(),
         description: text("description"),
         path: text("path").notNull(),
         isPublic: boolean("is_public").default(false).notNull(),

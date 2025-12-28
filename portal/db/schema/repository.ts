@@ -19,6 +19,7 @@ export const repository = pgTable(
     {
         id: varchar("id", { length: 36 }).primaryKey(),
         name: varchar("name", { length: 255 }).notNull(),
+        slug: varchar("slug", { length: 255 }).notNull(),
         description: text("description"),
         userId: varchar("user_id", { length: 36 })
             .notNull()
