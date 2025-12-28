@@ -16,3 +16,8 @@ Use this as well when you need to create relationships between objects.
 - Table names are always singular, for example: we store users in the `user` table.
 - Table variables always have the naming convention `<object>Table`.
 - Use snake casing when naming columns in a table.
+
+## Special cases
+
+- Tables modeling many-to-many relationships don't need the createdAt and updatedAt columns.
+- The tags table doesn't need a createdAt and updatedAt column because it's part of promps, skills, and agents.
