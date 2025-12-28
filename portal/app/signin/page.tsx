@@ -1,5 +1,4 @@
-import { signIn } from "@/lib/auth-client";
-import { GitHubSignInButton } from "./github-signin-button";
+import { GitHubSignInButton } from "@/components/auth/github-signin-button";
 
 export default function SignInPage() {
   return (
