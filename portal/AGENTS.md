@@ -59,9 +59,21 @@ The database connection is configured via the `DATABASE_URI` environment variabl
   - Configured with CSS variables
   - Uses Lucide icons
   - Components stored in `@/components/ui` (aliased path)
+- **Forms**: React Hook Form with Zod validation
+  - Use Zod schemas for form validation
+  - Integrate with React Hook Form for form state management
+  - Validation schemas should be defined alongside server actions
 - **Fonts**: Geist Sans and Geist Mono (optimized via `next/font`)
 - **TypeScript**: Strict mode enabled
 - **Path Aliases**: `@/*` maps to root directory
+
+### Server Actions
+
+- **API Pattern**: Server Actions are used instead of REST API endpoints
+- Server actions handle all data mutations and queries
+- Actions should include proper validation and error handling
+- Use `"use server"` directive at the top of action files
+- Server actions are the preferred way to interact with the database
 
 ### File Structure
 
