@@ -136,7 +136,7 @@ export const agent = pgTable(
         id: text("id").primaryKey(),
         name: text("name").notNull(),
         description: text("description"),
-        instructions: text("instructions").notNull(),
+        path: text("path").notNull(),
         repositoryId: text("repository_id")
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
