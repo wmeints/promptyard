@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
+import { user } from "./user";
 
 export const prompt = pgTable(
     "prompt",
@@ -22,6 +23,13 @@ export const prompt = pgTable(
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
         isPublic: boolean("is_public").default(false).notNull(),
+        createdBy: varchar("created_by", { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        updatedBy: varchar("updated_by", { length: 36 }).references(
+            () => user.id,
+            { onDelete: "cascade" }
+        ),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at")
             .defaultNow()
@@ -35,6 +43,16 @@ export const promptRelations = relations(prompt, ({ one, many }) => ({
     repository: one(repository, {
         fields: [prompt.repositoryId],
         references: [repository.id],
+    }),
+    creator: one(user, {
+        fields: [prompt.createdBy],
+        references: [user.id],
+        relationName: "promptCreator",
+    }),
+    updater: one(user, {
+        fields: [prompt.updatedBy],
+        references: [user.id],
+        relationName: "promptUpdater",
     }),
     promptTags: many(promptTag),
 }));

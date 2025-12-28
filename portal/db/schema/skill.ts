@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
+import { user } from "./user";
 
 export const skill = pgTable(
     "skill",
@@ -22,6 +23,13 @@ export const skill = pgTable(
         repositoryId: varchar("repository_id", { length: 36 })
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
+        createdBy: varchar("created_by", { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        updatedBy: varchar("updated_by", { length: 36 }).references(
+            () => user.id,
+            { onDelete: "cascade" }
+        ),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at")
             .defaultNow()
@@ -35,6 +43,16 @@ export const skillRelations = relations(skill, ({ one, many }) => ({
     repository: one(repository, {
         fields: [skill.repositoryId],
         references: [repository.id],
+    }),
+    creator: one(user, {
+        fields: [skill.createdBy],
+        references: [user.id],
+        relationName: "skillCreator",
+    }),
+    updater: one(user, {
+        fields: [skill.updatedBy],
+        references: [user.id],
+        relationName: "skillUpdater",
     }),
     skillTags: many(skillTag),
 }));

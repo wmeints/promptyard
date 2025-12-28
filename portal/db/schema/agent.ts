@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { repository } from "./repository";
 import { tag } from "./tag";
+import { user } from "./user";
 
 export const agent = pgTable(
     "agent",
@@ -22,6 +23,13 @@ export const agent = pgTable(
             .notNull()
             .references(() => repository.id, { onDelete: "cascade" }),
         isPublic: boolean("is_public").default(false).notNull(),
+        createdBy: varchar("created_by", { length: 36 })
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        updatedBy: varchar("updated_by", { length: 36 }).references(
+            () => user.id,
+            { onDelete: "cascade" }
+        ),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at")
             .defaultNow()
@@ -35,6 +43,16 @@ export const agentRelations = relations(agent, ({ one, many }) => ({
     repository: one(repository, {
         fields: [agent.repositoryId],
         references: [repository.id],
+    }),
+    creator: one(user, {
+        fields: [agent.createdBy],
+        references: [user.id],
+        relationName: "agentCreator",
+    }),
+    updater: one(user, {
+        fields: [agent.updatedBy],
+        references: [user.id],
+        relationName: "agentUpdater",
     }),
     agentTags: many(agentTag),
 }));
