@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 16 application using the App Router, with authentication via Better Auth, database management via Drizzle ORM (PostgreSQL), and UI components from shadcn/ui. The runtime is Bun.
+This is a Next.js 16 application using the App Router, with authentication via Better Auth, database management via
+Drizzle ORM (PostgreSQL), and UI components from shadcn/ui. The runtime is Bun.
 
 ## Commands
 
@@ -21,7 +22,8 @@ bun lint               # Run ESLint
 bun push-db            # Push database schema changes to PostgreSQL
 ```
 
-The database connection is configured via the `DATABASE_URI` environment variable. Note: The codebase is designed to work with Aspire, which automatically configures DATABASE_URI.
+The database connection is configured via the `DATABASE_URI` environment variable. Note: The codebase is designed to
+work with Aspire, which automatically configures DATABASE_URI.
 
 ## Architecture
 
@@ -104,3 +106,8 @@ drizzle.config.ts      # Drizzle Kit configuration
 - Strict mode enabled
 - Path alias `@/*` configured for imports from root
 - JSX runtime: react-jsx (automatic)
+
+## Testing
+
+- Only write unit-tests for non-component files recognizable by the `.ts` file extension. You can use the `unit-testing` skill for testing logic.
+- Only write component tests for component files recognizable by the `.tsx` file extension. You can use the `component-testing` skill for testing components.
