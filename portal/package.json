@@ -10,6 +10,7 @@
     "db:push": "bun --bun drizzle-kit push"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
     "better-auth": "^1.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

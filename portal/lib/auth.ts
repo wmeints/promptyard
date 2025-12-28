@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
-import { repository } from "@/db/schema";
+import * as schema from "@/db/schema";
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "pg" }),
+  database: drizzleAdapter(db, { provider: "pg", schema: schema }),
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -15,8 +15,7 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (ctx) => {
-          // Automatically create a user repository for the user.
-          await db.insert(repository).values({
+          await db.insert(schema.repository).values({
             id: crypto.randomUUID(),
             name: ctx.name,
             userId: ctx.id,
