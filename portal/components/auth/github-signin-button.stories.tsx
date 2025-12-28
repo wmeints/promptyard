@@ -1,6 +1,6 @@
 import { GitHubSignInButton } from "./github-signin-button";
-import { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, fn, userEvent, within } from "@storybook/test";
+import { StoryObj } from "@storybook/nextjs-vite";
+import { expect, within } from "storybook/test";
 
 const meta = {
     component: GitHubSignInButton,
