@@ -24,8 +24,20 @@ jobs:
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.0.1
+        with:
+          bun-version-file: portal/package.json
+      
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('portal/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: bunx playwright install chromium --with-deps
       
       - name: Install dependencies
