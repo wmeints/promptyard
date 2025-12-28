@@ -15,7 +15,7 @@ var githubClientSecret = builder.AddParameter("githubClientSecret", secret: true
 
 // This script initializes the database for the portal application.
 // The portal application will wait for this script to complete before starting.
-var portalInitScript = builder.AddBunApp("portal-init", "../portal", "push-db")
+var portalInitScript = builder.AddBunApp("portal-init", "../portal", "db:push")
     .WithReference(applicationDatabase)
     .WaitFor(applicationDatabase);
 
