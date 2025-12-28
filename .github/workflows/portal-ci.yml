@@ -25,6 +25,9 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.0.1
       
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium --with-deps
+      
       - name: Install dependencies
         run: bun install --frozen-lockfile
       
@@ -33,9 +36,6 @@ jobs:
       
       - name: Run unit tests
         run: bun run test:run
-      
-      - name: Install Playwright browsers
-        run: bunx playwright install chromium --with-deps
       
       - name: Run Storybook tests
         run: bun run storybook:run
