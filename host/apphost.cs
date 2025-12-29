@@ -24,12 +24,13 @@ builder.AddBunApp("portal", "../portal", "dev")
     .WithEnvironment("BETTER_AUTH_URL", authPublicUrl)
     .WithEnvironment("GITHUB_CLIENT_ID", githubClientId)
     .WithEnvironment("GITHUB_CLIENT_SECRET", githubClientSecret)
+    .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0")
     .WithReference(applicationDatabase)
     .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WaitFor(applicationDatabase)
     .WaitForCompletion(portalInitScript)
-    .WithOtlpExporter();
+    .WithOtlpExporter().WithOtlpExporter(OtlpProtocol.HttpProtobuf);
 
 
 builder.Build().Run();
