@@ -2,6 +2,8 @@
 #:package CommunityToolkit.Aspire.Hosting.Bun@13.0.1-beta.468
 #:sdk Aspire.AppHost.Sdk@13.1.0
 
+using Microsoft.Extensions.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var databaseServer = builder.AddPostgres("postgres").WithDataVolume().WithPgWeb();
@@ -19,12 +21,15 @@ var portalInitScript = builder.AddBunApp("portal-init", "../portal", "db:push")
     .WithReference(applicationDatabase)
     .WaitFor(applicationDatabase);
 
+// NOTE: We're skipping TLS checks in development mode to allow self-signed certificates.
+// In production, proper TLS verification should be enforced.
+
 builder.AddBunApp("portal", "../portal", "dev")
     .WithEnvironment("BETTER_AUTH_SECRET", authSecretKey)
     .WithEnvironment("BETTER_AUTH_URL", authPublicUrl)
     .WithEnvironment("GITHUB_CLIENT_ID", githubClientId)
     .WithEnvironment("GITHUB_CLIENT_SECRET", githubClientSecret)
-    .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", "0")
+    .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", builder.Environment.IsDevelopment() ? "0" : "1")
     .WithReference(applicationDatabase)
     .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
