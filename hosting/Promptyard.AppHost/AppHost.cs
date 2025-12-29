@@ -21,9 +21,9 @@ var portalRealm = builder.AddParameter("portalRealm");
 
 var keycloak = builder
     .AddKeycloak(
-        name: "keycloak", 
-        adminUsername: keycloakAdminUserName, 
-        adminPassword: keycloakAdminPassword, 
+        name: "keycloak",
+        adminUsername: keycloakAdminUserName,
+        adminPassword: keycloakAdminPassword,
         port: 8080
     )
     .WithDataVolume()
