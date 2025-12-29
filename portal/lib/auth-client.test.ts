@@ -29,7 +29,7 @@ describe("auth-client", () => {
                 process.env.NEXT_PUBLIC_APP_URL = "https://example.com";
 
                 // Re-import the module to pick up the new env var
-                const mod = await import("./auth-client?url=1");
+                await import("./auth-client?url=1");
 
                 expect(mockCreateAuthClient).toHaveBeenCalledWith({
                     baseURL: "https://example.com",
@@ -46,7 +46,7 @@ describe("auth-client", () => {
                 delete process.env.NEXT_PUBLIC_APP_URL;
 
                 // Re-import the module to pick up the new env var
-                const mod = await import("./auth-client?url=2");
+                await import("./auth-client?url=2");
 
                 expect(mockCreateAuthClient).toHaveBeenCalledWith({
                     baseURL: "http://localhost:3000",
