@@ -5,6 +5,7 @@ import {
     timestamp,
     boolean,
     index,
+    uniqueIndex,
     varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./user";
@@ -31,7 +32,10 @@ export const repository = pgTable(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [index("repository_userId_idx").on(table.userId)]
+    (table) => [
+        index("repository_userId_idx").on(table.userId),
+        uniqueIndex("repository_slug_idx").on(table.slug),
+    ]
 );
 
 export const repositoryRelations = relations(repository, ({ one, many }) => ({

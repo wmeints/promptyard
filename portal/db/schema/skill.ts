@@ -4,6 +4,7 @@ import {
     text,
     timestamp,
     index,
+    uniqueIndex,
     boolean,
     varchar,
     primaryKey,
@@ -37,7 +38,13 @@ export const skill = pgTable(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [index("skill_repositoryId_idx").on(table.repositoryId)]
+    (table) => [
+        index("skill_repositoryId_idx").on(table.repositoryId),
+        uniqueIndex("skill_repositoryId_slug_idx").on(
+            table.repositoryId,
+            table.slug
+        ),
+    ]
 );
 
 export const skillRelations = relations(skill, ({ one, many }) => ({

@@ -4,6 +4,7 @@ import {
     text,
     timestamp,
     index,
+    uniqueIndex,
     boolean,
     varchar,
     primaryKey,
@@ -37,7 +38,13 @@ export const agent = pgTable(
             .$onUpdate(() => /* @__PURE__ */ new Date())
             .notNull(),
     },
-    (table) => [index("agent_repositoryId_idx").on(table.repositoryId)]
+    (table) => [
+        index("agent_repositoryId_idx").on(table.repositoryId),
+        uniqueIndex("agent_repositoryId_slug_idx").on(
+            table.repositoryId,
+            table.slug
+        ),
+    ]
 );
 
 export const agentRelations = relations(agent, ({ one, many }) => ({
