@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## OpenTelemetry
+
+The portal is instrumented with OpenTelemetry for distributed tracing using `@vercel/otel`.
+
+### Environment Variables
+
+When running with Aspire, these are automatically injected via `.WithOtlpExporter()`:
+- `OTEL_EXPORTER_OTLP_ENDPOINT` - OTLP collector endpoint
+- `OTEL_SERVICE_NAME` - Service identifier for traces
+
+### Local Development (without Aspire)
+
+Create `.env.local`:
+
+```
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+OTEL_SERVICE_NAME=promptyard-portal
+```
+
+### Verbose Tracing
+
+Enable detailed spans for debugging:
+
+```
+NEXT_OTEL_VERBOSE=1
+```

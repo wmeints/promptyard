@@ -20,6 +20,7 @@ export const auth = betterAuth({
             name: ctx.name,
             userId: ctx.id,
             isPublic: false,
+            slug: 'test'
           });
         },
       },
