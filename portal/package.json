@@ -19,6 +19,7 @@
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-slot": "^1.2.4",
+    "@vercel/otel": "^2.1.0",
     "better-auth": "^1.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

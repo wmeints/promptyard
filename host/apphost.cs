@@ -28,7 +28,8 @@ builder.AddBunApp("portal", "../portal", "dev")
     .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WaitFor(applicationDatabase)
-    .WaitForCompletion(portalInitScript);
+    .WaitForCompletion(portalInitScript)
+    .WithOtlpExporter();
 
 
 builder.Build().Run();
