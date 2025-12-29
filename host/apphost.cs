@@ -30,7 +30,7 @@ builder.AddBunApp("portal", "../portal", "dev")
     .WithExternalHttpEndpoints()
     .WaitFor(applicationDatabase)
     .WaitForCompletion(portalInitScript)
-    .WithOtlpExporter().WithOtlpExporter(OtlpProtocol.HttpProtobuf);
+    .WithOtlpExporter(OtlpProtocol.HttpProtobuf);
 
 
 builder.Build().Run();
