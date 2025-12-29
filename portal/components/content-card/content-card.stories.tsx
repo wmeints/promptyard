@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react-vite";
+import { Meta, StoryObj } from "@storybook/nextjs";
 import { FileText, Sparkles, Bot, FolderGit2, MoreVertical } from "lucide-react";
 import {
   ContentCard,
@@ -10,13 +10,13 @@ import {
   ContentCardStats,
   ContentCardFooter,
 } from "./content-card";
-import { Button } from "../button";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../dropdown-menu";
+} from "../ui/dropdown-menu";
 
 const meta = {
   component: ContentCard,

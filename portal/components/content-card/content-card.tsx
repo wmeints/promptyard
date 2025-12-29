@@ -64,7 +64,7 @@ function ContentCard({
   )
 }
 
-interface ContentCardHeaderProps extends React.ComponentProps<"div"> {}
+type ContentCardHeaderProps = React.ComponentProps<"div">
 
 function ContentCardHeader({ className, ...props }: ContentCardHeaderProps) {
   return (
@@ -224,7 +224,7 @@ function ContentCardStats({
   )
 }
 
-interface ContentCardFooterProps extends React.ComponentProps<"div"> {}
+type ContentCardFooterProps = React.ComponentProps<"div">
 
 function ContentCardFooter({ className, ...props }: ContentCardFooterProps) {
   return (
