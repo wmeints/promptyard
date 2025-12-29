@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/hosting/">
+    <Project Path="hosting/Promptyard.AppHost/Promptyard.AppHost.csproj" />
+  </Folder>
+</Solution>
