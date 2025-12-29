@@ -1,17 +1,21 @@
 {
     "permissions": {
         "allow": [
+            "Bash(cd:*)",
             "Bash(git:*)",
+            "Bash(gh:*)",
             "Bash(ls:*)",
             "Bash(cat:*)",
             "Bash(rg:*)",
             "Bash(head:*)",
             "Bash(tail:*)",
             "Bash(sed:*)",
+            "Bash(bun:*)",
             "ReadFile:*",
             "WriteFile:*",
-            "DeleteFile:*",
-            "Bun:*"
+            "Update:*",
+            "Edit:*",
+            "DeleteFile:*"
         ]
     }
 }
