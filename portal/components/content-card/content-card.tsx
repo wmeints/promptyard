@@ -231,7 +231,7 @@ function ContentCardFooter({ className, ...props }: ContentCardFooterProps) {
     <div
       data-slot="content-card-footer"
       className={cn(
-        "flex items-center gap-2 border-t border-border pt-3 -mx-4 px-4 mt-auto",
+        "flex items-center gap-2 border-t border-border pt-3 -mx-3 md:-mx-4 lg:-mx-6 px-3 md:px-4 lg:px-6 mt-auto",
         className
       )}
       {...props}
