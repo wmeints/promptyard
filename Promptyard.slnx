@@ -1,4 +1,9 @@
 <Solution>
+  <Folder Name="/api/">
+    <Project Path="api/Promptyard.Api.ServiceDefaults/Promptyard.Api.ServiceDefaults.csproj" />
+    <Project Path="api/Promptyard.Api.Tests/Promptyard.Api.Tests.csproj" />
+    <Project Path="api/Promptyard.Api/Promptyard.Api.csproj" />
+  </Folder>
   <Folder Name="/hosting/">
     <Project Path="hosting/Promptyard.AppHost/Promptyard.AppHost.csproj" />
   </Folder>
