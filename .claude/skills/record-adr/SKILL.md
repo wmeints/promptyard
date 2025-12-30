@@ -24,5 +24,5 @@ IMPORTANT: If you don't have this information, ask the user to provide the infor
 
 ## Where to store the ADR files
 
-- Store ADR files in docs/architecture/decisions
+- Store ADR files in docs/architecture/adr
 - Give a unique number to each ADR and write files like this: `001-title-of-the-adr.md`
