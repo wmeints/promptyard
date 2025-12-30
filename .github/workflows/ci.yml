@@ -87,10 +87,10 @@ jobs:
                       ${{ runner.os }}-nuget-
 
             - name: Restore dependencies
-              run: dotnet restore
+              run: dotnet restore Promptyard.slnx
 
             - name: Build
-              run: dotnet build --no-restore
+              run: dotnet build --no-restore Promptyard.slnx
 
             - name: Run unit tests
-              run: dotnet test --no-build --verbosity normal
+              run: dotnet test --no-build --verbosity normal Promptyard.slnx
