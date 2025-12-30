@@ -1,6 +1,6 @@
 ---
 name: documenting-architecture
-description: Use this skill to record architecture documentation in the project.
+description: Use this skill when modifying or creating architecture documentation.
 ---
 
 ## Documenting architecture
