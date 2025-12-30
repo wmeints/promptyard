@@ -28,15 +28,15 @@ dotnet user-secrets set "<secret-name>" "<secret-value>"
 
 Make sure to create the following secrets:
 
-| Secret Name                       | Secret Value                                                            |
-|-----------------------------------|-------------------------------------------------------------------------|
-| `Parameters:portalClientId`       | The keycloak client ID for the portal                                   |
-| `Parameters:portalClientSecret`   | The keycloak client secret for the portal                               |
-| `Parameters:portalRealm           | The keycloak realm where the portal is registered                       |
-| `Parameters:keycloakAdminUserName | The username of the keycloak admin user                                 |
-| `Parameters:keycloakAdminPassword | The password of the keycloak admin user                                 |
-| `Parameters:authSecretKey`        | The authentication secret key, you can set this to a random value       |
-| `Parameters:publicAuthUrl`        | The public url for the application (optional if you're running locally) |
+| Secret Name                        | Secret Value                                                            |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| `Parameters:portalClientId`        | The keycloak client ID for the portal                                   |
+| `Parameters:portalClientSecret`    | The keycloak client secret for the portal                               |
+| `Parameters:portalRealm`           | The keycloak realm where the portal is registered                       |
+| `Parameters:keycloakAdminUserName` | The username of the keycloak admin user                                 |
+| `Parameters:keycloakAdminPassword` | The password of the keycloak admin user                                 |
+| `Parameters:authSecretKey`         | The authentication secret key, you can set this to a random value       |
+| `Parameters:publicAuthUrl`         | The public url for the application (optional if you're running locally) |
 
 ### Running the application
 
@@ -48,10 +48,12 @@ aspire run
 
 ## Configuring the keycloak environment
 
-TODO: Describe how to configure keycloak for the application.
+Follow the [keycloak](./docs/engineering/keycloak.md) guide in the engineering
+documentation to configure keycloak.
 
 ## Documentation
 
 - [User documentation](docs/user)
+- [Engineering documentation](docs/engineering)
 - [Product documentation](docs/product)
 - [Architecture documentation](docs/architecture)
