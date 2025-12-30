@@ -16,7 +16,7 @@
             "Update:*",
             "Edit:*",
             "DeleteFile:*",
-            "Skill:*"
+            "Skill(*)"
         ]
     }
 }

@@ -1,0 +1,16 @@
+# [ADR000] - Title of the ADR
+
+- **Status**: Accepted/Proposed/Superseeded
+- **Date:** Date recording this decision
+
+## Context
+
+[Record the context of the decision here]
+
+## Decision
+
+[Record the decision here]
+
+## Consequences
+
+[Record the consequences of the decision here]
