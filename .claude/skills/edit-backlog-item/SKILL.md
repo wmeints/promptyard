@@ -27,5 +27,5 @@ You should use this skill also when asked to write or edit user stories or bugs.
 ## Recording user stories and bugs
 
 - Important: record user stories and bugs in the GitHub repository associated with the codebase!
-- Use the label `type:bug` for recording bugs on GitHub.
-- Use the label `type:user-story` for recording user stories on GitHub.
+- Use the label `kind:bug` for recording bugs on GitHub.
+- Use the label `kind:story` for recording user stories on GitHub.

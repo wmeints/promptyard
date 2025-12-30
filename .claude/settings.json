@@ -15,7 +15,8 @@
             "WriteFile:*",
             "Update:*",
             "Edit:*",
-            "DeleteFile:*"
+            "DeleteFile:*",
+            "Skill:*"
         ]
     }
 }

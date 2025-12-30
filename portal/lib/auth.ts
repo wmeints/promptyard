@@ -1,31 +1,30 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/db";
-import * as schema from "@/db/schema";
-import { generateUniqueRepositorySlug } from "@/lib/slug";
+import {
+    genericOAuth,
+    auth0,
+    hubspot,
+    keycloak,
+    line,
+    microsoftEntraId,
+    okta,
+    slack,
+    patreon,
+} from "better-auth/plugins";
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "pg", schema: schema }),
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    emailAndPassword: {
+        enabled: false,
     },
-  },
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (ctx) => {
-          const slug = await generateUniqueRepositorySlug(ctx.name);
-          await db.insert(schema.repository).values({
-            id: crypto.randomUUID(),
-            name: ctx.name,
-            userId: ctx.id,
-            isPublic: false,
-            slug,
-          });
-        },
-      },
-    },
-  },
+    plugins: [
+        genericOAuth({
+            config: [
+                keycloak({
+                    clientId: process.env.KEYCLOAK_CLIENT_ID!,
+                    clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
+                    issuer: `${process.env.KEYCLOAK_HTTP!}/realms/${process.env
+                        .KEYCLOAK_REALM!}`,
+                }),
+            ],
+        }),
+    ],
 });

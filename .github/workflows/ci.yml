@@ -1,0 +1,92 @@
+name: CI
+
+on:
+    pull_request:
+        paths:
+            - "portal/**"
+            - "api/**"
+            - ".github/workflows/portal-ci.yml"
+
+permissions:
+    contents: read
+
+jobs:
+    validate-portal:
+        name: Validate Portal Project
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: portal
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2.0.1
+
+            - name: Cache Playwright browsers
+              uses: actions/cache@v5
+              id: playwright-cache
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: ${{ runner.os }}-playwright-${{ hashFiles('portal/bun.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-playwright-
+
+            - name: Install Playwright browsers
+              if: steps.playwright-cache.outputs.cache-hit != 'true'
+              run: bunx playwright install chromium --with-deps
+
+            - name: Cache Bun dependencies
+              uses: actions/cache@v5
+              id: bun-cache
+              with:
+                  path: portal/node_modules
+                  key: ${{ runner.os }}-bun-${{ hashFiles('portal/bun.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-bun-
+
+            - name: Install dependencies
+              if: steps.bun-cache.outputs.cache-hit != 'true'
+              run: bun install --frozen-lockfile
+
+            - name: Run ESLint
+              run: bun run lint
+
+            - name: Run unit tests
+              run: bun run test:run
+
+            - name: Run Storybook tests
+              run: bun run storybook:run
+
+    validate-api:
+        name: Validate API Project
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: 10.0.x
+
+            - name: Cache NuGet packages
+              uses: actions/cache@v5
+              with:
+                  path: ~/.nuget/packages
+                  key: ${{ runner.os }}-nuget-${{ hashFiles('api/**/*.csproj') }}
+                  restore-keys: |
+                      ${{ runner.os }}-nuget-
+
+            - name: Restore dependencies
+              run: dotnet restore Promptyard.slnx
+
+            - name: Build
+              run: dotnet build --no-restore Promptyard.slnx
+
+            - name: Run unit tests
+              run: dotnet test --no-build --verbosity normal Promptyard.slnx
