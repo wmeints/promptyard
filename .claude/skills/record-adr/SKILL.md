@@ -3,7 +3,7 @@ name: record-adr
 description: Use this to create or modify architecture decision records (ADRs)
 ---
 
-IMPORTANT: Use the template stored in ./templates/adr.md to record the architecture decision.
+IMPORTANT: Use the template stored in `./templates/adr.md` to record the architecture decision.
 
 ## Guidelines for recording the decision
 
@@ -24,5 +24,6 @@ IMPORTANT: If you don't have this information, ask the user to provide the infor
 
 ## Where to store the ADR files
 
-- Store ADR files in docs/architecture/adr
+- Store ADR files in `docs/architecture/adr`
 - Give a unique number to each ADR and write files like this: `001-title-of-the-adr.md`
+- Include the ADR in the TOC in `09-decisions.md` located in in `docs/architecture`
