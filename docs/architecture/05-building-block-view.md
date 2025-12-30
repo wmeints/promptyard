@@ -6,7 +6,42 @@ solution starting at the technical context.
 
 ## Technical context
 
-TODO: Add diagram
+The following diagram shows the top-level technical architecture of the system:
+
+```mermaid
+C4Context
+    title System Context Diagram for Promptyard
+
+    Person(user, "User", "A user of the application")
+
+    System_Boundary(promptyard, "Promptyard") {
+        Container(portal, "Portal", "Next.js + Bun", "User interface and client-side application")
+        Container(api, "Backend API", "ASP.NET Core + Marten", "Business logic, data access, and API endpoints")
+    }
+
+    System(keycloak, "Keycloak", "Authentication and authorization via OAuth2/OIDC")
+    ContainerDb(postgres, "PostgreSQL", "Database", "Persistent storage for application data")
+
+    Rel(user, portal, "Uses")
+    Rel(portal, api, "HTTP requests")
+    Rel(portal, keycloak, "OAuth2/OIDC")
+    Rel(api, postgres, "Document storage")
+    Rel(api, keycloak, "Token validation")
+```
+
+| Component   | Technology               | Responsibility                                   |
+| ----------- | ------------------------ | ------------------------------------------------ |
+| PostgreSQL  | PostgreSQL database      | Persistent storage for application data          |
+| Keycloak    | Keycloak identity server | Authentication and authorization via OAuth2/OIDC |
+| Backend API | ASP.NET Core + Marten    | Business logic, data access, and API endpoints   |
+| Portal      | Next.js + Bun            | User interface and client-side application       |
+
+### Component relationships
+
+- **Portal → API**: The portal sends HTTP requests to the backend API to create, read, update, and delete content on behalf of the user.
+- **Portal → Keycloak**: The portal uses Keycloak for user authentication via OAuth2/OIDC. Users sign in through Keycloak and receive tokens for API access.
+- **API → PostgreSQL**: The API uses Marten as a document database layer on top of PostgreSQL to store and retrieve application data.
+- **API → Keycloak**: The API validates authentication tokens issued by Keycloak to authorize incoming requests.
 
 ## Backend API
 
