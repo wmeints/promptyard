@@ -1,7 +1,7 @@
 using JasperFx;
 using JasperFx.Events.Projections;
 using Marten;
-using Promptyard.Api.Application.Repositories;
+using Promptyard.Api.Repositories;
 using Wolverine;
 using Wolverine.FluentValidation;
 using Wolverine.Http;

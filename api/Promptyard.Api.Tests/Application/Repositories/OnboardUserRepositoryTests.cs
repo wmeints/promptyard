@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
-using Promptyard.Api.Application.Repositories;
+using Promptyard.Api.Repositories;
 using Promptyard.Api.Tests.Shared;
 using Wolverine.Http;
 
