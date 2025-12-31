@@ -1,16 +1,13 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using Alba;
+﻿using Alba;
 using Alba.Security;
-using DotNet.Testcontainers.Configurations;
 using JasperFx.CommandLine;
-using Oakton;
 using Testcontainers.PostgreSql;
 using TUnit.Core.Interfaces;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Promptyard.Api.IntegrationTests;
 
-public sealed class AlbaBootstrap: IAsyncInitializer, IAsyncDisposable
+public sealed class AlbaBootstrap : IAsyncInitializer, IAsyncDisposable
 {
     public PostgreSqlContainer? DatabaseContainer { get; private set; }
     public IAlbaHost? Host { get; private set; }
@@ -25,29 +22,29 @@ public sealed class AlbaBootstrap: IAsyncInitializer, IAsyncDisposable
         {
             ["ConnectionStrings:applicationDatabase"] = DatabaseContainer.GetConnectionString(),
         };
-        
+
         var authenticationStub = new JwtSecurityStub()
             .WithName("test-user")
             .With(JwtRegisteredClaimNames.Email, "test@domain.org");
 
         JasperFxEnvironment.AutoStartHost = true;
-        
+
         Host = await AlbaHost.For<Program>(
-            authenticationStub, 
+            authenticationStub,
             ConfigurationOverride.Create(databaseConfiguration));
     }
 
     public async ValueTask DisposeAsync()
     {
-        
+
         if (Host != null)
         {
-            await Host.DisposeAsync();    
+            await Host.DisposeAsync();
         }
-        
+
         if (DatabaseContainer != null)
         {
-            await DatabaseContainer.StopAsync();    
+            await DatabaseContainer.StopAsync();
         }
     }
 }
