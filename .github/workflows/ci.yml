@@ -89,4 +89,4 @@ jobs:
               run: dotnet build --no-restore Promptyard.slnx
 
             - name: Run unit tests
-              run: dotnet test --no-build --verbosity normal Promptyard.slnx
+              run: dotnet test --no-build --verbosity normal

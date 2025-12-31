@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/api/">
+    <Project Path="api/Promptyard.Api.IntegrationTests/Promptyard.Api.IntegrationTests.csproj" />
     <Project Path="api/Promptyard.Api.ServiceDefaults/Promptyard.Api.ServiceDefaults.csproj" />
     <Project Path="api/Promptyard.Api.Tests/Promptyard.Api.Tests.csproj" />
     <Project Path="api/Promptyard.Api/Promptyard.Api.csproj" />

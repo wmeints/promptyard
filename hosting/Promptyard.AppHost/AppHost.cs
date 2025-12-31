@@ -48,11 +48,11 @@ builder.AddBunApp("portal", "../../portal", "dev")
     .WithEnvironment("KEYCLOAK_REALM", portalRealm)
     .WithEnvironment("NODE_TLS_REJECT_UNAUTHORIZED", builder.Environment.IsDevelopment() ? "0" : "1")
     .WithReference(keycloak)
+    .WithReference(api)
     .WaitFor(keycloak)
     .WaitFor(api)
     .WithHttpEndpoint(port: 3000, env: "PORT")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter(OtlpProtocol.HttpProtobuf);
-
 
 builder.Build().Run();

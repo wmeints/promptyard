@@ -1,5 +1,7 @@
 using JasperFx;
+using JasperFx.Events.Projections;
 using Marten;
+using Promptyard.Api.Features.Repositories;
 using Wolverine;
 using Wolverine.Http;
 using Wolverine.Marten;
@@ -17,7 +19,7 @@ builder.Host.UseWolverine(options =>
 });
 
 builder.Services
-    .AddMarten(options => { })
+    .AddMarten(options => { options.Projections.Add<RepositorySummaryProjection>(ProjectionLifecycle.Async); })
     .IntegrateWithWolverine()
     .UseNpgsqlDataSource();
 
@@ -36,6 +38,8 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddTransient<IRepositorySlugGenerator, RepositorySlugGenerator>();
 
 var app = builder.Build();
 
