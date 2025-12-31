@@ -1,30 +1,17 @@
 import { betterAuth } from "better-auth";
 import {
+    createAuthMiddleware,
     genericOAuth,
     keycloak,
-    createAuthMiddleware,
 } from "better-auth/plugins";
-
-import { userRepositoryExists, createUserRepository } from "./api";
+import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
     emailAndPassword: {
         enabled: false,
     },
-    hooks: {
-        after: createAuthMiddleware(async (ctx) => {
-            // After the user is logged in, we need to verify they have a user repository.
-            // If not, we should call the user repository creation endpoint.
-            if (ctx.path === "/oauth2/callback/:providerId") {
-                const exists = await userRepositoryExists();
-
-                if (!exists) {
-                    await createUserRepository();
-                }
-            }
-        }),
-    },
     plugins: [
+        nextCookies(),
         genericOAuth({
             config: [
                 keycloak({

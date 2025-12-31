@@ -1,24 +1,79 @@
 "use server";
 
-const serviceKey = "api";
-const serviceScheme = "https";
+import { eq, and } from "drizzle-orm";
+import { db } from "@/db";
+import { account } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-const apiUrl = process.env[`services__${serviceKey}__${serviceScheme}_0`];
+const apiUrl = process.env.services__api__https__0;
 
-export async function userRepositoryExists(): Promise<boolean> {
-    const response = await fetch(`${apiUrl}/repository/user`, {});
+console.log(apiUrl);
 
-    if (response.ok) {
-        return true;
-    } else if (response.status == 404) {
+export interface OnboardUserRequest {
+    fullName: string;
+    introduction?: string;
+}
+
+export interface UserRepositoryDetails {
+    id: string;
+    userId: string;
+    name: string;
+    slug: string;
+    description?: string;
+}
+
+export async function isUserOnboarded(): Promise<boolean> {
+    const { accessToken } = await auth.api.getAccessToken({
+        headers: await headers(),
+        body: {
+            providerId: "keycloak",
+        },
+    });
+
+    const response = await fetch(`${apiUrl}/api/repository/user`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (response.status === 404) {
         return false;
     }
 
-    throw new Error("Unexpected response from API");
+    if (response.status === 200) {
+        return true;
+    }
+
+    throw new Error(`Unexpected API response status: ${response.status}`);
 }
 
-export async function createUserRepository(): Promise<void> {
-    const response = await fetch(`${apiUrl}/repository/user`, {
-        method: "POST",
+export async function onboardUser(
+    request: OnboardUserRequest
+): Promise<UserRepositoryDetails> {
+    const { accessToken } = await auth.api.getAccessToken({
+        headers: await headers(),
+        body: {
+            providerId: "keycloak",
+        },
     });
+
+    const response = await fetch(`${apiUrl}/api/repository/user`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+            fullName: request.fullName,
+            introduction: request.introduction,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to onboard user: ${errorText}`);
+    }
+
+    return await response.json();
 }
