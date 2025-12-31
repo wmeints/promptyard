@@ -2,7 +2,7 @@ using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var databaseServer = builder.AddPostgres("postgres").WithDataVolume();
+var databaseServer = builder.AddPostgres("postgres").WithDataVolume().WithPgWeb();
 var applicationDatabase = databaseServer.AddDatabase("applicationDatabase", "promptyard");
 
 var authSecretKey = builder.AddParameter("authSecretKey", secret: true);
@@ -13,8 +13,6 @@ var keycloakAdminPassword = builder.AddParameter("keycloakAdminPassword", secret
 var portalClientId = builder.AddParameter("portalClientId");
 var portalClientSecret = builder.AddParameter("portalClientSecret", secret: true);
 var portalRealm = builder.AddParameter("portalRealm");
-
-// http://localhost:3000/api/auth/oauth2/callback/keycloak
 
 // NOTE: Keycloak has a persistent lifetime because it's super slow to start.
 // If you have any problems with keycloak, you can reboot it through the dashboard.

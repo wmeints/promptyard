@@ -76,6 +76,123 @@ The portal client handles user login via OAuth2 authorization code flow.
 7. After saving, go to the **Credentials** tab
 8. Copy the **Client secret** value - you will need this for the Aspire configuration
 
+## Configuring the API Scope
+
+The `api:manage` scope allows the portal to access the API's management
+endpoints. This scope must be created and assigned to the portal client.
+
+### Creating the Client Scope
+
+1. In the Keycloak admin console, ensure you have the `promptyard` realm selected
+2. Navigate to **Client scopes** in the left menu
+3. Click **Create client scope**
+4. Configure the scope:
+   - **Name**: `api:manage`
+   - **Description**: `Allows management access to the Promptyard API`
+   - **Type**: None
+   - **Protocol**: OpenID Connect
+   - Click **Save**
+
+### Adding the Scope to the Portal Client
+
+1. Navigate to **Clients** in the left menu
+2. Click on the `promptyard.portal` client
+3. Go to the **Client scopes** tab
+4. Click **Add client scope**
+5. Select `api:manage` from the list
+6. Choose **Default** (the scope will be included in all token requests)
+7. Click **Add**
+
+### Configuring the API Audience
+
+To ensure the access token includes the correct audience for the API, add an
+audience mapper to the scope:
+
+1. Navigate to **Client scopes** in the left menu
+2. Click on `api:manage`
+3. Go to the **Mappers** tab
+4. Click **Add mapper** → **By configuration**
+5. Select **Audience**
+6. Configure the mapper:
+   - **Name**: `promptyard-api-audience`
+   - **Included Client Audience**: `promptyard.api`
+   - **Add to ID token**: Off
+   - **Add to access token**: On
+   - Click **Save**
+
+### Verifying the Configuration
+
+After configuration, access tokens issued to the portal will include:
+
+- The `api:manage` scope in the `scope` claim
+- `promptyard.api` in the `aud` (audience) claim
+
+This allows the API to validate that the token was issued for its consumption
+and that the user has management permissions.
+
+## Configuring the Content Manager Role
+
+The `content-manager` role grants users access to manage content in Promptyard.
+Users with this role can access the API's management endpoints.
+
+### Creating the Role
+
+1. In the Keycloak admin console, ensure you have the `promptyard` realm selected
+2. Navigate to **Realm roles** in the left menu
+3. Click **Create role**
+4. Configure the role:
+   - **Role name**: `content-manager`
+   - **Description**: `Allows users to manage content in Promptyard`
+   - Click **Save**
+
+### Assigning the Role as Default
+
+To ensure all new users automatically receive the `content-manager` role:
+
+1. Navigate to **Realm settings** in the left menu
+2. Go to the **User registration** tab
+3. Click on **Default roles**
+4. Click **Assign role**
+5. Select `content-manager` from the list
+6. Click **Assign**
+
+All newly created users will now automatically have the `content-manager` role.
+
+### Linking the Role to the API Scope
+
+To ensure the `api:manage` scope is only granted to users with the `content-manager`
+role, add a role mapper to the scope:
+
+1. Navigate to **Client scopes** in the left menu
+2. Click on `api:manage`
+3. Go to the **Scope** tab
+4. Click **Assign role**
+5. Select `content-manager` from the list
+6. Click **Assign**
+
+This restricts the `api:manage` scope to only be included in tokens for users
+who have the `content-manager` role.
+
+### Adding the Role to Tokens
+
+To include the user's roles in the access token for API authorization:
+
+1. Navigate to **Client scopes** in the left menu
+2. Click on `api:manage`
+3. Go to the **Mappers** tab
+4. Click **Add mapper** → **By configuration**
+5. Select **User Realm Role**
+6. Configure the mapper:
+   - **Name**: `realm-roles`
+   - **Token Claim Name**: `roles`
+   - **Add to ID token**: Off
+   - **Add to access token**: On
+   - **Add to userinfo**: Off
+   - Click **Save**
+
+The API can now check the `roles` claim in the access token to verify the user
+has the `content-manager` role.
+
 ## Creating Users
 
 1. Navigate to **Users** in the left menu
