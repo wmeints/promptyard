@@ -1,4 +1,4 @@
-﻿using Alba;
+using Alba;
 using Alba.Security;
 using JasperFx.CommandLine;
 using Testcontainers.PostgreSql;
@@ -22,7 +22,6 @@ public sealed class AlbaBootstrap : IAsyncInitializer, IAsyncDisposable
         {
             ["ConnectionStrings:applicationDatabase"] = DatabaseContainer.GetConnectionString(),
         };
-
         var authenticationStub = new JwtSecurityStub()
             .WithName("test-user")
             .With(JwtRegisteredClaimNames.Email, "test@domain.org");
@@ -36,7 +35,6 @@ public sealed class AlbaBootstrap : IAsyncInitializer, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-
         if (Host != null)
         {
             await Host.DisposeAsync();
