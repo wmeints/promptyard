@@ -1,9 +1,11 @@
 using JasperFx;
 using JasperFx.Events.Projections;
 using Marten;
-using Promptyard.Api.Features.Repositories;
+using Promptyard.Api.Repositories;
 using Wolverine;
+using Wolverine.FluentValidation;
 using Wolverine.Http;
+using Wolverine.Http.FluentValidation;
 using Wolverine.Marten;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,10 +18,15 @@ builder.Host.UseWolverine(options =>
 {
     options.Policies.AutoApplyTransactions();
     options.Policies.UseDurableLocalQueues();
+    options.UseFluentValidation();
 });
 
 builder.Services
-    .AddMarten(options => { options.Projections.Add<RepositorySummaryProjection>(ProjectionLifecycle.Async); })
+    .AddMarten(options =>
+    {
+        options.Projections.Add<RepositoryDetailsProjection>(ProjectionLifecycle.Async);
+        options.Projections.Add<UserRepositoryDetailsProjection>(ProjectionLifecycle.Inline);
+    })
     .IntegrateWithWolverine()
     .UseNpgsqlDataSource();
 
@@ -40,6 +47,7 @@ builder.Services
 builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<IRepositorySlugGenerator, RepositorySlugGenerator>();
+builder.Services.AddTransient<IUserRepositoryLookup, UserRepositoryLookup>();
 
 var app = builder.Build();
 
@@ -48,7 +56,11 @@ app.UseAuthorization();
 app.UseRequestTimeouts();
 app.UseOutputCache();
 
-app.MapWolverineEndpoints();
+app.MapWolverineEndpoints(options =>
+{
+    options.UseFluentValidationProblemDetailMiddleware();
+});
+
 app.MapDefaultEndpoints();
 
 await app.RunJasperFxCommands(args);

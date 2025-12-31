@@ -11,12 +11,16 @@
             "Bash(tail:*)",
             "Bash(sed:*)",
             "Bash(bun:*)",
+            "Bash(dotnet:*)",
             "ReadFile:*",
             "WriteFile:*",
             "Update:*",
             "Edit:*",
             "DeleteFile:*",
-            "Skill(*)"
+            "Skill(endpoint-implementation)",
+            "Skill(unit-testing)",
+            "Skill(backlog-management)",
+            "Skill(architecture-documentation)"
         ]
     }
 }
