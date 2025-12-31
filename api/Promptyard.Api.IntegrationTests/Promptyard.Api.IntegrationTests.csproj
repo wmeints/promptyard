@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Alba" Version="8.4.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.9.0" />
+    <PackageReference Include="TUnit" Version="1.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Promptyard.Api\Promptyard.Api.csproj" />
+  </ItemGroup>
+
+</Project>
