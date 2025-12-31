@@ -56,11 +56,35 @@ The backend API uses vertical slice architecture to implement functional slices.
 The vertical slices make it easier for us to extend functionality as we add more
 features to the application.
 
+The application has an `Application` directory that contains sub directories
+for each feature group. We've identified the following feature groups:
+
+- Users: Manages everything related to the user aggregate
+- Repositories: Manages everything related to the repository aggregate
+- Prompts: Manages everything related to the prompt aggregate
+- Skills: Manages everything related to the skill aggregate
+- Agents: Manages everything related to the agent aggregate
+
+In each feature group we create a single file per feature slice. For example:
+The user repository onboarding workflow is located in `Application/Repositories/OnboardUserRepository.cs`.
+
+A vertical slice contains at least these components:
+
+- A command `OnboardUserRepository`
+- A response `UserRepositoryDetails`
+- The endpoint `OnboardUserRepositoryEndpoint`
+- One or more events, for example: `UserRepositoryOnboarded`
+- A validator for the input `OnboardUserRepositoryValidator` using fluent
+  validation: https://wolverinefx.net/guide/http/validation.html#fluent-validation-middleware
+
 ### Event sourcing
 
 We use event sourcing to make it easier for us to reason about business logic
 in terms of actions and events that happen as a consequence. We apply event
 projections to provide convenient read models for the portal to render data.
+
+We use domain aggregates to help us reason about incoming operations. Domain aggregates
+are part of the feature group directories in the application.
 
 ## Portal
 

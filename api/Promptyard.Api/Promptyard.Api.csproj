@@ -15,6 +15,7 @@
     <PackageReference Include="Aspire.Npgsql" Version="13.1.0" />
     <PackageReference Include="Marten" Version="8.17.0" />
     <PackageReference Include="WolverineFx.Http" Version="5.9.2" />
+    <PackageReference Include="WolverineFx.Http.FluentValidation" Version="5.9.2" />
     <PackageReference Include="WolverineFx.Http.Marten" Version="5.9.2" />
     <PackageReference Include="WolverineFx.Marten" Version="5.9.2" />
   </ItemGroup>

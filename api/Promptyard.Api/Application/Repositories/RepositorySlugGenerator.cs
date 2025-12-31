@@ -1,21 +1,21 @@
 ﻿using System.Text.RegularExpressions;
 using Marten;
 
-namespace Promptyard.Api.Features.Repositories;
+namespace Promptyard.Api.Application.Repositories;
 
 public interface IRepositorySlugGenerator
 {
     string GenerateSlug(string name, Guid? repositoryId = null);
 }
 
-public class RepositorySlugGenerator(IDocumentSession session): IRepositorySlugGenerator
+public class RepositorySlugGenerator(IDocumentSession session) : IRepositorySlugGenerator
 {
     public string GenerateSlug(string name, Guid? repositoryId = null)
     {
         var generatedSlug = GenerateRawSlug(name);
-        
+
         var collidingSlugs = session
-            .Query<RepositorySummary>()
+            .Query<RepositoryDetails>()
             .Where(x => x.Slug.StartsWith(generatedSlug));
 
         if (repositoryId != null)
@@ -24,7 +24,7 @@ public class RepositorySlugGenerator(IDocumentSession session): IRepositorySlugG
         }
 
         var slugCount = collidingSlugs.Count();
-        
+
         if (slugCount > 0)
         {
             return $"{generatedSlug}-{slugCount}";

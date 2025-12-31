@@ -1,4 +1,6 @@
-﻿namespace Promptyard.Api.IntegrationTests;
+﻿using Alba;
+
+namespace Promptyard.Api.IntegrationTests;
 
 [ClassDataSource<AlbaBootstrap>(Shared = SharedType.PerTestSession)]
 public class RegisterUserRepositoryEndpointTests(AlbaBootstrap bootstrap): AlbaTestBase(bootstrap)
@@ -8,7 +10,13 @@ public class RegisterUserRepositoryEndpointTests(AlbaBootstrap bootstrap): AlbaT
     {
         await Host.Scenario(_ =>
         {
-            _.Post.Url("/api/repositories/user");
+            var onboardingDetails = new
+            {
+                FullName = "John Doe",
+                Description = "I love prompts!"
+            };
+            
+            _.Post.Json(onboardingDetails).ToUrl("/api/repository/user");
             _.StatusCodeShouldBe(200);
         });
     }
