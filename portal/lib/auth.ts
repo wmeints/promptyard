@@ -1,9 +1,5 @@
 import { betterAuth } from "better-auth";
-import {
-    createAuthMiddleware,
-    genericOAuth,
-    keycloak,
-} from "better-auth/plugins";
+import { genericOAuth, keycloak } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({

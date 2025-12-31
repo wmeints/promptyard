@@ -1,14 +1,9 @@
 "use server";
 
-import { eq, and } from "drizzle-orm";
-import { db } from "@/db";
-import { account } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 const apiUrl = process.env.services__api__https__0;
-
-console.log(apiUrl);
 
 export interface OnboardUserRequest {
     fullName: string;
