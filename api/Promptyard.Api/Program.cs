@@ -1,6 +1,7 @@
 using JasperFx;
 using JasperFx.Events.Projections;
 using Marten;
+using Microsoft.IdentityModel.Tokens;
 using Promptyard.Api.Repositories;
 using Wolverine;
 using Wolverine.FluentValidation;
@@ -24,7 +25,7 @@ builder.Host.UseWolverine(options =>
 builder.Services
     .AddMarten(options =>
     {
-        options.Projections.Add<RepositoryDetailsProjection>(ProjectionLifecycle.Async);
+        options.Projections.Add<RepositoryDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<UserRepositoryDetailsProjection>(ProjectionLifecycle.Inline);
     })
     .IntegrateWithWolverine()
@@ -38,6 +39,13 @@ builder.Services
     {
         options.Audience = "promptyard.api";
 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateLifetime = true,
+        };
+        
         if (builder.Environment.IsDevelopment())
         {
             options.RequireHttpsMetadata = false;
