@@ -58,6 +58,7 @@ app.UseOutputCache();
 
 app.MapWolverineEndpoints(options =>
 {
+    options.WarmUpRoutes = RouteWarmup.Eager;
     options.UseFluentValidationProblemDetailMiddleware();
 });
 
