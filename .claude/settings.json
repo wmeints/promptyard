@@ -12,6 +12,9 @@
             "Bash(sed:*)",
             "Bash(bun:*)",
             "Bash(dotnet:*)",
+            "Bash(npm:*)",
+            "Bash(nx:*)",
+            "Bash(npx shadcn@latest add:*)",
             "ReadFile:*",
             "WriteFile:*",
             "Update:*",
@@ -19,10 +22,14 @@
             "DeleteFile:*",
             "Skill(endpoint-implementation)",
             "Skill(unit-testing)",
+            "Skill(component-testing)",
             "Skill(backlog-management)",
             "Skill(architecture-documentation)",
             "Skill(test-review)",
             "WebFetch(domain:ui.shadcn.com)"
         ]
-    }
+    },
+    "enabledMcpjsonServers": [
+        "nx-mcp"
+    ]
 }

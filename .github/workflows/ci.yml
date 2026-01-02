@@ -12,19 +12,26 @@ permissions:
 
 jobs:
     validate-portal:
-        name: Validate Portal Project
+        name: Validate changes
         runs-on: ubuntu-latest
-
-        defaults:
-            run:
-                working-directory: portal
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  filter: tree:0
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2.0.1
+            - name: Setup Node
+              uses: actions/setup-node@v6
+              with:
+                  node-version: "22"
+                  cache: "npm"
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: 10.0.x
 
             - name: Cache Playwright browsers
               uses: actions/cache@v5
@@ -37,42 +44,7 @@ jobs:
 
             - name: Install Playwright browsers
               if: steps.playwright-cache.outputs.cache-hit != 'true'
-              run: bunx playwright install chromium --with-deps
-
-            - name: Cache Bun dependencies
-              uses: actions/cache@v5
-              id: bun-cache
-              with:
-                  path: portal/node_modules
-                  key: ${{ runner.os }}-bun-${{ hashFiles('portal/bun.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-bun-
-
-            - name: Install dependencies
-              if: steps.bun-cache.outputs.cache-hit != 'true'
-              run: bun install --frozen-lockfile
-
-            - name: Run ESLint
-              run: bun run lint
-
-            - name: Run unit tests
-              run: bun run test:run
-
-            - name: Run Storybook tests
-              run: bun run storybook:run
-
-    validate-api:
-        name: Validate API Project
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v5
-              with:
-                  dotnet-version: 10.0.x
+              run: npx playwright install chromium --with-deps
 
             - name: Cache NuGet packages
               uses: actions/cache@v5
@@ -82,11 +54,10 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-nuget-
 
-            - name: Restore dependencies
-              run: dotnet restore Promptyard.slnx
+            - name: Install build dependencies
+              run: npm ci
 
-            - name: Build
-              run: dotnet build --no-restore Promptyard.slnx
-
-            - name: Run unit tests
-              run: dotnet test --no-build --verbosity normal
+            - name: Build changes
+              run: npx nx affected -t restore lint test build --base=origin/main --head=$PR_BRANCH_NAME
+              env:
+                  BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}

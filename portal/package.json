@@ -1,19 +1,16 @@
 {
-  "name": "promptyard",
+  "name": "portal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run --project=specs",
     "storybook": "storybook dev -p 6006",
-    "storybook:run": "vitest run --project=storybook",
-    "db:push": "bun --bun drizzle-kit push",
-    "db:migrate": "bun --bun drizzle-kit migrate",
-    "db:generate": "bun --bun drizzle-kit generate"
+    "storybook:run": "vitest run --project=storybook"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -34,7 +31,7 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.2"
+    "zod": "^4.3.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.3",

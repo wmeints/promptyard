@@ -1,1 +1,16 @@
 .idea/
+.nx/installation
+.nx/cache
+.nx/workspace-data
+# .NET
+/artifacts/
+
+# Next.js
+.next
+out
+
+# Node
+node_modules/
+
+# MCP server config
+.mcp.json

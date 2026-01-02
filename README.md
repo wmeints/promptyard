@@ -10,17 +10,30 @@ and agents within your organization.
 - [Docker](https://docker.com/) or [Podman](https://podman.io/)
 - [.NET 10 SDK](https://dot.net/)
 - [Aspire](https://aspire.dev/)
+- [Nx](https://nx.dev)
 
 ## Getting started
 
-Getting started locally involves a few steps outlined below. Most of these steps are a one-time affair, so don't worry
-if this feels a little long and complicated. You only need to do these steps once per machine.
+Getting started locally involves a few steps outlined below. Most of these steps
+are a one-time affair, so don't worry if this feels a little long and
+complicated. You only need to do these steps once per machine.
+
+### Setting up the MCP server
+
+This project uses the Nx MCP server to provide Claude Code with context\
+information about the repository setup. You need different configurations
+depending on your operating system.
+
+- Copy `mcp.windows.json` to `.mcp.json` in the root of the cloned repository
+  for the MCP server config on Windows
+- Copy `mcp.posix.json` to `.mcp.json` in the root of the cloned repository
+  for the MCP server config on Mac/Linux
 
 ### Setting secrets and configuration parameters
 
 This application uses the Aspire to manage the local orchestration of
-components. You should configure the following secrets in the `hosting/Promptyard.AppHost` directory
-with the following command:
+components during development. You should configure the following secrets in the 
+`hosting/Promptyard.AppHost` directory with the following command:
 
 ```bash
 dotnet user-secrets set "<secret-name>" "<secret-value>"

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "nx-mcp": {
+      "type": "stdio",
+      "command": "cmd /c npx",
+      "args": [
+        "nx",
+        "mcp"
+      ]
+    }
+  }
+}

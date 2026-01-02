@@ -1,0 +1,6 @@
+{
+    "name": "portal",
+    "implicitDependencies": [
+        "api"
+    ]
+}

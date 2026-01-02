@@ -1,0 +1,37 @@
+{
+  "installation": {
+    "version": "22.3.3"
+  },
+  "plugins": [
+    "@nx/dotnet",
+    {
+      "plugin": "@nx/next/plugin",
+      "options": {
+        "startTargetName": "start",
+        "buildTargetName": "build",
+        "devTargetName": "dev",
+        "serveStaticTargetName": "serve-static",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
+      }
+    }
+  ],
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.Tests/**/*",
+      "!{projectRoot}/**/bin/**/*",
+      "!{projectRoot}/**/obj/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["restore", "^build"],
+      "inputs": ["production", "^production"],
+      "cache": true
+    }
+  }
+}

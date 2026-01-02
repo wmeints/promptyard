@@ -1,0 +1,13 @@
+{
+    "name": "api-integration-tests",
+    "targets": {
+        "test": {
+            "executor": "nx:run-commands",
+            "dependsOn": ["build"],
+            "options": {
+                "command": "dotnet run",
+                "cwd": "{projectRoot}"
+            }
+        }
+    }
+}
