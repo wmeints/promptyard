@@ -20,6 +20,7 @@ jobs:
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
+                  filter: tree:0
 
             - name: Setup Node
               uses: actions/setup-node@v6
@@ -57,4 +58,4 @@ jobs:
               run: npm install
 
             - name: Build changes
-              run: npx nx affected -t lint test build
+              run: nx affected -t lint test build --base=origin/main --head=$PR_BRANCH_NAME
