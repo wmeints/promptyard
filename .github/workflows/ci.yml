@@ -82,11 +82,8 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-nuget-
 
-            - name: Restore dependencies
-              run: dotnet restore Promptyard.slnx
-
-            - name: Build
-              run: dotnet build --no-restore Promptyard.slnx
-
             - name: Run unit tests
-              run: dotnet test --no-build --verbosity normal
+              run: dotnet test api/Promptyard.Api.Tests/Promptyard.Api.Tests.csproj
+
+            - name: Run integration tests
+              run: dotnet test api/Promptyard.Api.Tests/Promptyard.Api.IntegrationTests.csproj
