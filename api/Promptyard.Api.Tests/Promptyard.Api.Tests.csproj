@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Promptyard.Api\Promptyard.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\" />
+  </ItemGroup>
+
 </Project>
