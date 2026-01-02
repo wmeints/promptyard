@@ -58,4 +58,4 @@ jobs:
               run: npm install
 
             - name: Build changes
-              run: nx affected -t lint test build --base=origin/main --head=$PR_BRANCH_NAME
+              run: npx nx affected -t lint test build --base=origin/main --head=$PR_BRANCH_NAME
