@@ -55,7 +55,7 @@ jobs:
                       ${{ runner.os }}-nuget-
 
             - name: Install build dependencies
-              run: npm ci
+              run: npm ci --include=optional
 
             - name: Build changes
               run: npx nx affected -t restore lint test build --base=origin/main --head=$PR_BRANCH_NAME
