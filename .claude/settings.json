@@ -12,6 +12,7 @@
             "Bash(sed:*)",
             "Bash(bun:*)",
             "Bash(dotnet:*)",
+            "Bash(npm:*)",
             "Bash(nx:*)",
             "Bash(npx shadcn@latest add:*)",
             "ReadFile:*",
