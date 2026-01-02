@@ -2,7 +2,7 @@
   "mcpServers": {
     "nx-mcp": {
       "type": "stdio",
-      "command": "cmd /c npx",
+      "command": "npx",
       "args": [
         "nx",
         "mcp"

@@ -11,3 +11,6 @@ out
 
 # Node
 node_modules/
+
+# MCP server config
+.mcp.json
