@@ -21,6 +21,7 @@
             "Skill(unit-testing)",
             "Skill(backlog-management)",
             "Skill(architecture-documentation)",
+            "Skill(test-review)",
             "WebFetch(domain:ui.shadcn.com)"
         ]
     }
