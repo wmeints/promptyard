@@ -72,3 +72,38 @@ export async function onboardUser(
 
     return await response.json();
 }
+
+export interface RepositoryDetails {
+    id: string;
+    slug: string;
+    name: string;
+    description?: string | null;
+}
+
+export async function getRepositoryBySlug(
+    slug: string
+): Promise<RepositoryDetails | null> {
+    const { accessToken } = await auth.api.getAccessToken({
+        headers: await headers(),
+        body: {
+            providerId: "keycloak",
+        },
+    });
+
+    const response = await fetch(`${apiUrl}/api/repository/${slug}`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch repository: ${errorText}`);
+    }
+
+    return await response.json();
+}

@@ -17,4 +17,12 @@ public class RepositoryLookup(IDocumentSession session) : IRepositoryLookup
 
         return query.Count();
     }
+
+    public async Task<RepositoryDetails?> GetBySlugAsync(string slug)
+    {
+        return await session
+            .Query<RepositoryDetails>()
+            .Where(x => x.Slug == slug)
+            .FirstOrDefaultAsync();
+    }
 }
