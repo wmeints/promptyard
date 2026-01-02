@@ -12,12 +12,8 @@
             }
         },
         "build": {
-            "dependsOn": ["api:build"],
-            "configurations": {
-                "development": {},
-                "production": {}
-            },
-            "defaultConfiguration": "production"
+
+            "dependsOn": ["restore"]
         }
     }
 }
