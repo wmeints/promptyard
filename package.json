@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Promptyard is a web application that makes it easy to reuse efforts in applying\r generative AI across multiple teams. Help colleagues share prompts, skills,\r and agents within your organization.",
   "main": "index.js",
+  "workspaces": [
+    "portal"
+  ],
   "directories": {
     "doc": "docs"
   },

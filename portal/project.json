@@ -2,18 +2,5 @@
     "name": "portal",
     "implicitDependencies": [
         "api"
-    ],
-    "targets": {
-        "restore": {
-            "executor": "nx:run-commands",
-            "options": {
-                "command": "npm install",
-                "cwd": "{projectRoot}"
-            }
-        },
-        "build": {
-
-            "dependsOn": ["restore"]
-        }
-    }
+    ]
 }

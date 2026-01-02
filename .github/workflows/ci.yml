@@ -54,8 +54,8 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-nuget-
 
-            - name: Install dependencies
-              run: npm install
+            - name: Install build dependencies
+              run: npm ci
 
             - name: Build changes
               run: npx nx affected -t restore lint test build --base=origin/main --head=$PR_BRANCH_NAME
