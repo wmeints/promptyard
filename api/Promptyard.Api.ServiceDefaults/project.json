@@ -1,0 +1,16 @@
+{
+    "name": "api-service-defaults",
+    "targets": {
+        "build": {
+            "configurations": {
+                "development": {
+                    "args": ["-c", "Debug"]
+                },
+                "production": {
+                    "args": ["-c", "Release"]
+                }
+            },
+            "defaultConfiguration": "development"
+        }
+    }
+}

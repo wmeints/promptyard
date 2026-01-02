@@ -1,0 +1,30 @@
+{
+  "name": "promptyard",
+  "version": "1.0.0",
+  "description": "Promptyard is a web application that makes it easy to reuse efforts in applying\r generative AI across multiple teams. Help colleagues share prompts, skills,\r and agents within your organization.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmeints/promptyard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wmeints/promptyard/issues"
+  },
+  "homepage": "https://github.com/wmeints/promptyard#readme",
+  "devDependencies": {
+    "@nx/dotnet": "^22.3.3",
+    "@nx/next": "^22.3.3"
+  },
+  "dependencies": {
+    "next": "~16.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

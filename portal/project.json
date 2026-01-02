@@ -1,0 +1,16 @@
+{
+    "name": "portal",
+    "implicitDependencies": [
+        "api"
+    ],
+    "targets": {
+        "build": {
+            "dependsOn": ["api:build"],
+            "configurations": {
+                "development": {},
+                "production": {}
+            },
+            "defaultConfiguration": "production"
+        }
+    }
+}
