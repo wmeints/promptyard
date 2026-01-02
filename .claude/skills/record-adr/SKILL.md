@@ -17,6 +17,11 @@ IMPORTANT: Use the template stored in `./templates/adr.md` to record the archite
 
 IMPORTANT: If you don't have this information, ask the user to provide the information!
 
+## Guidelines for recording the options considered
+
+- Create a sub section per option and provide a short description of the pros and cons of the option.
+- Keep the description short and consise
+
 ## Guidelines for recording the consequences
 
 - List the consequences one-by-one
