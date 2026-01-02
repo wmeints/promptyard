@@ -51,5 +51,8 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-nuget-
 
+            - name: Install dependencies
+              run: npm install
+
             - name: Build changes
               run: npx nx affected -t lint test build
