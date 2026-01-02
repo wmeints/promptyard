@@ -26,7 +26,6 @@ jobs:
               uses: actions/setup-node@v6
               with:
                   node-version: "22"
-                  cache: "npm"
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v5
@@ -38,7 +37,7 @@ jobs:
               id: playwright-cache
               with:
                   path: ~/.cache/ms-playwright
-                  key: ${{ runner.os }}-playwright-${{ hashFiles('portal/bun.lock') }}
+                  key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-playwright-
 
