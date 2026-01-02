@@ -20,7 +20,9 @@
   "homepage": "https://github.com/wmeints/promptyard#readme",
   "devDependencies": {
     "@nx/dotnet": "^22.3.3",
-    "@nx/next": "^22.3.3"
+    "@nx/next": "^22.3.3",
+    "@swc-node/register": "^1.11.1",
+    "@swc/core": "^1.15.8"
   },
   "dependencies": {
     "next": "~16.0.1",
