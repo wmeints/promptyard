@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Alba;
 using Promptyard.Api.Repositories;
 
@@ -17,7 +19,6 @@ public class FetchUserRepositoryEndpointTests(AlbaBootstrap bootstrap) : AlbaTes
     }
 
     [Test]
-    [DependsOn(nameof(FetchUserRepository_WhenUserHasNoRepository_ReturnsNotFound))]
     public async Task FetchUserRepository_WhenUserHasRepository_ReturnsRepositoryDetails()
     {
         var onboardingDetails = new
@@ -25,11 +26,14 @@ public class FetchUserRepositoryEndpointTests(AlbaBootstrap bootstrap) : AlbaTes
             FullName = "Test User",
             Introduction = "Testing the fetch endpoint"
         };
-
-        // Onboard the user (may already be onboarded by another test)
-        await Host.Scenario(_ =>
+        
+        await Host.Scenario(scenario =>
         {
-            _.Post.Json(onboardingDetails).ToUrl("/api/repository/user");
+            // Replace the current user with a different user.
+            scenario.RemoveClaim(JwtRegisteredClaimNames.Name);
+            scenario.WithClaim(new Claim(JwtRegisteredClaimNames.Name, "test-user-2"));
+            
+            scenario.Post.Json(onboardingDetails).ToUrl("/api/repository/user");
         });
 
         // Fetch the user repository
