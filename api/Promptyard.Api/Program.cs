@@ -55,6 +55,7 @@ builder.Services
 builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<IRepositorySlugGenerator, RepositorySlugGenerator>();
+builder.Services.AddTransient<IRepositoryLookup, RepositoryLookup>();
 builder.Services.AddTransient<IUserRepositoryLookup, UserRepositoryLookup>();
 
 var app = builder.Build();

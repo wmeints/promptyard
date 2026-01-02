@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Marten;
 
 namespace Promptyard.Api.Repositories;
 
@@ -8,22 +7,13 @@ public interface IRepositorySlugGenerator
     string GenerateSlug(string name, Guid? repositoryId = null);
 }
 
-public class RepositorySlugGenerator(IDocumentSession session) : IRepositorySlugGenerator
+public class RepositorySlugGenerator(IRepositoryLookup repositoryLookup) : IRepositorySlugGenerator
 {
     public string GenerateSlug(string name, Guid? repositoryId = null)
     {
         var generatedSlug = GenerateRawSlug(name);
 
-        var collidingSlugs = session
-            .Query<RepositoryDetails>()
-            .Where(x => x.Slug.StartsWith(generatedSlug));
-
-        if (repositoryId != null)
-        {
-            collidingSlugs = collidingSlugs.Where(x => x.Id != repositoryId);
-        }
-
-        var slugCount = collidingSlugs.Count();
+        var slugCount = repositoryLookup.CountBySlugPrefix(generatedSlug, repositoryId);
 
         if (slugCount > 0)
         {
