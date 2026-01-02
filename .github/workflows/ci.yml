@@ -12,7 +12,7 @@ permissions:
 
 jobs:
     validate-portal:
-        name: Validate Portal Project
+        name: Validate changes
         runs-on: ubuntu-latest
 
         steps:
