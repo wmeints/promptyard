@@ -5,4 +5,5 @@ public record SkillDetails(
     Guid RepositoryId,
     string RepositorySlug,
     string Name,
-    string? Description);
+    string? Description,
+    string[] Tags);

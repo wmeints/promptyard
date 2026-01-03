@@ -27,8 +27,8 @@ public class GetRepositorySkillsEndpointTests
 
             var skills = new List<SkillDetails>
             {
-                new(Guid.NewGuid(), repositoryId, repositorySlug, "Skill 1", "Description 1"),
-                new(Guid.NewGuid(), repositoryId, repositorySlug, "Skill 2", "Description 2")
+                new(Guid.NewGuid(), repositoryId, repositorySlug, "Skill 1", "Description 1", []),
+                new(Guid.NewGuid(), repositoryId, repositorySlug, "Skill 2", "Description 2", ["tag1", "tag2"])
             };
 
             _expectedSkills = new PagedResult<SkillDetails>(
