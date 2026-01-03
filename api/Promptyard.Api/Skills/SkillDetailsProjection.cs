@@ -12,6 +12,7 @@ public class SkillDetailsProjection : EventProjection
             @event.RepositoryId,
             @event.RepositorySlug,
             @event.Name,
-            @event.Description));
+            @event.Description,
+            @event.Tags));
     }
 }
