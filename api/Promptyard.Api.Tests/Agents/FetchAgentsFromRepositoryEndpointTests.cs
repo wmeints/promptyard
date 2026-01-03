@@ -19,8 +19,8 @@ public class FetchAgentsFromRepositoryEndpointTests
         {
             var agents = new List<AgentDetails>
             {
-                new(Guid.NewGuid(), _repositoryId, "test-repo", "Agent 1", "Description 1"),
-                new(Guid.NewGuid(), _repositoryId, "test-repo", "Agent 2", null)
+                new(Guid.NewGuid(), _repositoryId, "test-repo", "Agent 1", "Description 1", ["tag1", "tag2"]),
+                new(Guid.NewGuid(), _repositoryId, "test-repo", "Agent 2", null, [])
             };
 
             _expectedResult = new PagedResult<AgentDetails>(agents, 1, 20, 2);
