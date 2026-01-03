@@ -35,8 +35,7 @@ public class GetRepositorySkillsEndpointTests
                 skills,
                 1,
                 20,
-                2,
-                1);
+                2);
 
             var repositoryLookup = A.Fake<IRepositoryLookup>();
             A.CallTo(() => repositoryLookup.GetBySlugAsync(repositorySlug))
@@ -90,7 +89,6 @@ public class GetRepositorySkillsEndpointTests
                 new List<SkillDetails>(),
                 1,
                 20,
-                0,
                 0);
 
             var repositoryLookup = A.Fake<IRepositoryLookup>();
@@ -169,7 +167,6 @@ public class GetRepositorySkillsEndpointTests
                 new List<SkillDetails>(),
                 1,
                 100,
-                0,
                 0);
 
             var repositoryLookup = A.Fake<IRepositoryLookup>();
@@ -211,7 +208,6 @@ public class GetRepositorySkillsEndpointTests
                 new List<SkillDetails>(),
                 1,
                 20,
-                0,
                 0);
 
             var repositoryLookup = A.Fake<IRepositoryLookup>();
