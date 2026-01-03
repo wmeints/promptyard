@@ -42,6 +42,9 @@ the following command inside the cloned github repository:
 jj git init --colocate
 ```
 
+We recommend using the [Jujutsu shell completions](https://docs.jj-vcs.dev/latest/install-and-setup/#dynamic-completions)
+to make working with the tool just a little easier still.
+
 ## Making changes with Jujutsu
 
 Just start editing files like you normally would. Don't worry about creating
@@ -51,14 +54,17 @@ When you're done, enter the following command to describe your changes:
 
 ```bash
 jj describe -m "The description of your change"
+```
+
+You can continue editing in the current change or you can start a new change.
+To start a new change, use the following command:
+
+```bash
 jj new
 ```
 
-The first line describes the commit. The second line starts a new change.
-You can navigate between changes as you wish with `jj edit <change-identifier>`
-to update them with more edits.
-
-You can get the list of changes by running `jj` without any arguments.
+**Note:** You can get the list of changes by running `jj` without any
+arguments. Each change will have a change id and associated git metadata.
 
 ## Creating a branch and pushing changes
 
@@ -79,14 +85,21 @@ jj git push
 ## Updating your local repository
 
 Jujutsu doesn't have the `git pull` command. You'll need these two commands
-to update the local repository:
+to update the local repository with any upstream changes:
 
 ```bash
 jj git fetch
-jj rebase -o $main_bookmark
+jj rebase -d <branch-name>
 ```
 
+## Updating the remote branch
 
+When you need to update a pull request with new changes, you can follow the 
+same workflow as you've used to make changes. After you're done updating your
+work you can update the remote branch following these steps:
 
+1. First, move the bookmark with `jj bookmark move <branch-name>`
+2. Then, push the changes with `jj git push`
 
+And you're done!
 
