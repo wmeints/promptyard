@@ -25,8 +25,7 @@ jobs:
             - name: Setup Node
               uses: actions/setup-node@v6
               with:
-                  node-version: "22"
-                  cache: "npm"
+                  node-version-file: ".nvmrc"
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v5
@@ -38,7 +37,7 @@ jobs:
               id: playwright-cache
               with:
                   path: ~/.cache/ms-playwright
-                  key: ${{ runner.os }}-playwright-${{ hashFiles('portal/bun.lock') }}
+                  key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-playwright-
 
@@ -55,9 +54,10 @@ jobs:
                       ${{ runner.os }}-nuget-
 
             - name: Install build dependencies
-              run: npm ci
+              run: npm ci --include=optional
 
             - name: Build changes
               run: npx nx affected -t restore lint test build --base=origin/main --head=$PR_BRANCH_NAME
               env:
+                  TUNIT_DISABLE_GITHUB_REPORTER: true 
                   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
