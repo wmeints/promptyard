@@ -6,6 +6,7 @@ public class Agent
     public Guid RepositoryId { get; private set; }
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
+    public string[] Tags { get; private set; } = [];
 
     private void Apply(AgentCreated agentCreated)
     {
@@ -13,5 +14,6 @@ public class Agent
         RepositoryId = agentCreated.RepositoryId;
         Name = agentCreated.Name;
         Description = agentCreated.Description;
+        Tags = agentCreated.Tags;
     }
 }

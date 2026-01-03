@@ -5,4 +5,5 @@ public record AgentDetails(
     Guid RepositoryId,
     string RepositorySlug,
     string Name,
-    string? Description);
+    string? Description,
+    string[] Tags);
