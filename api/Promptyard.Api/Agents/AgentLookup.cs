@@ -1,17 +1,17 @@
 using Marten;
 using Promptyard.Api.Shared;
 
-namespace Promptyard.Api.Skills;
+namespace Promptyard.Api.Agents;
 
-public class SkillLookup(IDocumentSession session) : ISkillLookup
+public class AgentLookup(IDocumentSession session) : IAgentLookup
 {
-    public async Task<PagedResult<SkillDetails>> GetByRepositorySlugAsync(
+    public async Task<PagedResult<AgentDetails>> GetByRepositorySlugAsync(
         string repositorySlug,
         int page = 1,
         int pageSize = 20)
     {
         var query = session
-            .Query<SkillDetails>()
+            .Query<AgentDetails>()
             .Where(x => x.RepositorySlug == repositorySlug);
 
         var totalCount = await query.CountAsync();
@@ -21,6 +21,6 @@ public class SkillLookup(IDocumentSession session) : ISkillLookup
             .Take(pageSize)
             .ToListAsync();
 
-        return new PagedResult<SkillDetails>(items, page, pageSize, totalCount);
+        return new PagedResult<AgentDetails>(items, page, pageSize, totalCount);
     }
 }
