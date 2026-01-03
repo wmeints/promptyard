@@ -3,6 +3,7 @@ using JasperFx.Events.Projections;
 using Marten;
 using Microsoft.IdentityModel.Tokens;
 using Promptyard.Api.Agents;
+using Promptyard.Api.Prompts;
 using Promptyard.Api.Repositories;
 using Promptyard.Api.Skills;
 using Wolverine;
@@ -31,6 +32,7 @@ builder.Services
         options.Projections.Add<UserRepositoryDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<SkillDetailsProjection>(ProjectionLifecycle.Inline);
         options.Projections.Add<AgentDetailsProjection>(ProjectionLifecycle.Inline);
+        options.Projections.Add<PromptDetailsProjection>(ProjectionLifecycle.Inline);
     })
     .IntegrateWithWolverine()
     .UseNpgsqlDataSource();
@@ -63,6 +65,7 @@ builder.Services.AddTransient<IRepositoryLookup, RepositoryLookup>();
 builder.Services.AddTransient<IUserRepositoryLookup, UserRepositoryLookup>();
 builder.Services.AddTransient<ISkillLookup, SkillLookup>();
 builder.Services.AddTransient<IAgentLookup, AgentLookup>();
+builder.Services.AddTransient<IPromptLookup, PromptLookup>();
 
 var app = builder.Build();
 
