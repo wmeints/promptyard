@@ -2,5 +2,13 @@
     "name": "portal",
     "implicitDependencies": [
         "api"
-    ]
+    ],
+    "targets": {
+        "test": {
+            "executor": "nx:run-script",
+            "options": {
+                "script": "test:run"
+            }
+        }
+    }
 }
