@@ -1,0 +1,24 @@
+{
+  "name": "@promptyard/cli",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "bin": {
+    "promptyard": "./index.ts"
+  },
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "index.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "test": "bun test --pass-with-no-tests"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
