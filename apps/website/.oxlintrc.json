@@ -5,6 +5,7 @@
     "correctness": "error"
   },
   "rules": {},
+  "plugins": ["nextjs", "react", "vitest"],
   "env": {
     "builtin": true
   }
