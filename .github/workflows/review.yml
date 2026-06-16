@@ -1,0 +1,22 @@
+name: Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+jobs:
+  review:
+    if: >-
+      contains(github.event.pull_request.labels.*.name, 'review:T1') ||
+      contains(github.event.pull_request.labels.*.name, 'review:T2')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.AI_GATEWAY_URL }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.GATEWAY_TOKEN }}
+        with:
+          prompt: "/code-review:high Review this PR for correctness, security, and adherence to our standards."
+          claude_args: "--model claude-opus-4-7 --max-turns 10"
