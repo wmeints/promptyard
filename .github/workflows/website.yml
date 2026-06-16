@@ -1,0 +1,37 @@
+name: Website
+
+on:
+  pull_request:
+    paths:
+      - "apps/website/**"
+      - "packages/**"
+      - "docker-compose.yml"
+      - ".github/workflows/website.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run --filter @promptyard/website lint
+
+      - name: Test
+        run: bun run --filter @promptyard/website test
+
+      - name: Build
+        run: bun run --filter @promptyard/website build
