@@ -1,6 +1,6 @@
 # Promptyard
 
-Promptyard allows you to share skills and agents in your oganization.
+Promptyard allows you to share skills and agents in your organization.
 
 ## System requirements
 
