@@ -14,9 +14,6 @@ jobs:
       id-token: write
     steps:
       - uses: anthropics/claude-code-action@v1
-        env:
-          ANTHROPIC_BASE_URL: ${{ secrets.AI_GATEWAY_URL }}
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.GATEWAY_TOKEN }}
         with:
-          prompt: "/code-review:high Review this PR for correctness, security, and adherence to our standards."
-          claude_args: "--model claude-opus-4-7 --max-turns 10"
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/code-review high"
