@@ -3,12 +3,28 @@ import postgres from "postgres";
 
 import * as schema from "./schema";
 
-const connectionString = process.env.DATABASE_URL;
+type Database = ReturnType<typeof drizzle<typeof schema>>;
 
-if (!connectionString) {
-  throw new Error("DATABASE_URL is not set");
+let instance: Database | undefined;
+
+function getDb(): Database {
+  if (!instance) {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is not set");
+    }
+
+    instance = drizzle(postgres(connectionString), { schema });
+  }
+
+  return instance;
 }
 
-const client = postgres(connectionString);
-
-export const db = drizzle(client, { schema });
+// Lazily initialise the connection on first use so importing this module
+// (e.g. during `next build`) never requires DATABASE_URL to be present.
+export const db = new Proxy({} as Database, {
+  get(_target, property, receiver) {
+    return Reflect.get(getDb(), property, receiver);
+  },
+});
