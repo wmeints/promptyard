@@ -3,6 +3,7 @@
 import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { useAppError } from "@/components/app-error";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,11 +38,18 @@ function initialsFor(user: SessionUser): string {
 
 export function UserMenu({ user }: { user: SessionUser }) {
   const router = useRouter();
+  const { setError, clearError } = useAppError();
   const displayName = user.name?.trim() || user.email?.trim() || "Account";
 
   async function handleSignOut() {
-    await authClient.signOut();
-    router.refresh();
+    clearError();
+    try {
+      await authClient.signOut();
+      router.refresh();
+    } catch {
+      // Sign-out failed; the user is still signed in, so surface the error.
+      setError("We couldn't sign you out. Please try again.");
+    }
   }
 
   return (
