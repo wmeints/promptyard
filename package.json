@@ -4,20 +4,21 @@
   "private": true,
   "description": "Promptyard helps you share skills, agents, and tips about agentic engineering",
   "keywords": [],
-  "author": "Willem Meints",
   "license": "ISC",
-  "packageManager": "bun@1.3.5",
+  "author": "Willem Meints",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "prepare": "husky",
+    "format": "oxfmt ."
+  },
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "husky": "^9.1.7",
     "oxfmt": "^0.55.0"
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
-  "scripts": {
-    "prepare": "husky"
-  }
+  "packageManager": "bun@1.3.5"
 }

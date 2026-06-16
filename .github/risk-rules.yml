@@ -1,0 +1,63 @@
+# risk-rules.yml — maps diff patterns to quality goals and minimum review tiers.
+# Commit this to your repo root (or .github/) so the PR author template and the
+# agent reviewer share one source of truth.
+#
+# How it's used:
+#   - Each rule's `paths` are matched (glob) against changed files in the diff.
+#   - A match sets the impact FLOOR to the rule's `min_tier`.
+#   - The reviewing agent may escalate above the floor (complexity, blast radius)
+#     but must NEVER route below it.
+#
+# Tiers: T1 = agent-only, T2 = agent + named human approval, T3 = line-by-line.
+
+rules:
+  - goal: authorization
+    description: Users must not be able to modify each other's content.
+    paths:
+      - "**/authz/**"
+    min_tier: T2 # never agent-only
+    review_focus: >
+      Confirm ownership/scoping checks cannot be bypassed and that the
+      OpenFGA model change doesn't widen access unintentionally.
+
+  - goal: authentication
+    description: Users must not access the application without logging in.
+    paths:
+      - "**/auth/**"
+      - "**/middleware/auth*"
+      - "**/*session*"
+      - "**/*token*"
+    min_tier: T2 # never agent-only
+    review_focus: >
+      Verify no route is unintentionally unprotected and token/session
+      handling has no bypass.
+
+  - goal: performance
+    description: The app must respond within 250ms for 95% of requests.
+    paths:
+      - "**/repositories/**"
+      - "**/queries/**"
+      - "**/cache/**"
+    triggers: # optional diff-content hints, not just paths
+      - "new synchronous I/O on a request path"
+      - "loop issuing per-item queries (N+1)"
+    min_tier: T2
+    review_focus: >
+      Check for N+1 patterns, unindexed queries, and new sync I/O on hot paths.
+      Author should attach a perf note.
+
+  - goal: data_integrity
+    description: The app must not lose data on migrations or upgrades.
+    paths:
+      - "**/migrations/**"
+      - "**/*.sql"
+      - "**/schema/**"
+    min_tier: T3 # line-by-line, always
+    requires_rollback_plan: true
+    review_focus: >
+      Walk the migration hunk by hunk. Confirm it is non-destructive or has a
+      tested rollback/backfill. No data loss on forward OR backward migration.
+
+# Changes matching nothing above default to T1 (agent-only), provided gates pass.
+defaults:
+  unmatched_tier: T1
