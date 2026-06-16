@@ -34,9 +34,9 @@ jobs:
 
             Note: The PR branch is already checked out in the current working directory.
 
-            Use `gh pr comment` for top-level feedback.
+            Use `gh pr comment` for top-level feedback. Use `.github/review-template.md` as a template for the top-level comments.
             Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
-            Only post GitHub comments - don't submit review text as messages.
+            Only post GitHub comments - don't submit review text as messages. Make sure there isn't already a comment about the same finding.
 
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
