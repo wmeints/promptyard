@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { AppErrorProvider } from "@/components/app-error";
 import { SiteHeader } from "@/components/site-header";
 import { getCurrentSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -44,8 +45,10 @@ export default async function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <SiteHeader user={session?.user ?? null} />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <AppErrorProvider>
+          <SiteHeader user={session?.user ?? null} />
+          <main className="flex flex-1 flex-col">{children}</main>
+        </AppErrorProvider>
       </body>
     </html>
   );
