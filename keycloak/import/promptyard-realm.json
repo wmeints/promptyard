@@ -1,0 +1,47 @@
+{
+  "realm": "promptyard",
+  "enabled": true,
+  "displayName": "Promptyard (Dev)",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "clients": [
+    {
+      "clientId": "promptyard-website",
+      "name": "Promptyard Website",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "promptyard-website-dev-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3000/api/auth/oauth2/callback/keycloak"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "testuser@promptyard.dev",
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-promptyard"
+      ]
+    }
+  ]
+}
