@@ -9,6 +9,7 @@
     "correctness": "error"
   },
   "rules": {},
+  "plugins": ["node", "import"],
   "env": {
     "builtin": true
   }
