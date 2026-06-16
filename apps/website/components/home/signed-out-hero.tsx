@@ -36,16 +36,16 @@ export function SignedOutHero() {
       </section>
 
       <section className="border-t bg-muted/40 px-6 py-16">
-        <p className="text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Why share?
-        </p>
+        </h2>
         <div className="mx-auto mt-10 grid max-w-4xl gap-10 sm:grid-cols-3">
           {benefits.map((benefit) => (
             <div key={benefit.number} className="flex flex-col items-center text-center">
               <span className="rounded-md bg-primary/10 px-2.5 py-1 font-mono text-sm text-primary">
                 {benefit.number}
               </span>
-              <h2 className="mt-4 font-semibold">{benefit.title}</h2>
+              <h3 className="mt-4 font-semibold">{benefit.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
             </div>
           ))}
