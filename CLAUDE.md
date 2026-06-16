@@ -18,6 +18,10 @@ This is a monorepo structure with the following key locations:
 
 None.
 
+## Commit guidelines
+
+When writing commit messages, follow [docs/engineering/commit-guidelines.md](docs/engineering/commit-guidelines.md). We use Conventional Commits, restricted to the types `feat`, `fix`, `docs`, `chore` and the scopes `authn`, `authz`, `content`, `search`.
+
 ## Review checklist
 
 - Run `pnpm lint` for each package and/or application you've modified and ensure issues are fixed.
