@@ -65,14 +65,23 @@ guessing the outcome.
 
 ### 5. Compute the review tier
 
-Load `risk-rules.yml` from the repo root or `.github/` (fall back to
-`assets/risk-rules.example.yml` and tell the user you used defaults). Then:
+Run the deterministic tier-computation script to get the impact floor:
 
-1. **Impact floor** — for each rule, glob-match its `paths` against the changed
-   files. Every match contributes its `min_tier`. The floor is the **highest**
-   `min_tier` triggered. Record which rule fired and which file triggered it. No
-   match → floor **T1**.
-2. **Complexity** — high (non-local reasoning, novel logic, cross-cutting) → +1 tier.
+```bash
+bun run .claude/skills/pr-create/scripts/compute-tier.ts --base <base>
+```
+
+This outputs JSON with `floor`, `fired_rules`, and `changed_files`. Use the
+script's output as the **authoritative impact floor** — do not re-derive it
+yourself. If the script errors, fall back to manual computation (see below).
+
+Then apply semantic escalation on top of the script's floor:
+
+1. **Impact floor** — taken directly from the script output. Record which rule
+   fired and which file triggered it (both are in the JSON). If `fired_rules` is
+   empty, record "No risk rule matched; default unmatched tier used."
+2. **Complexity** — if high (non-local reasoning, novel logic, cross-cutting),
+   raise the impact floor by one tier, capped at T3. Example: T1→T2, T2→T3, T3 stays T3.
 3. **Blast radius** — destructive/irreversible (data migration, irreversible side
    effect) → **T3**.
 
@@ -81,6 +90,15 @@ Load `risk-rules.yml` from the repo root or `.github/` (fall back to
 You may escalate above the floor; you must **never** route below it. If you were
 tempted to ("this auth change is tiny"), note it in the PR instead of acting on it
 — size never lowers an impact floor.
+
+<details><summary>Manual fallback (if script fails)</summary>
+
+Load `risk-rules.yml` from the repo root or `.github/`. For each rule,
+glob-match its `paths` against changed files. Every match contributes its
+`min_tier`. The floor is the highest `min_tier` triggered. No match → use
+`defaults.unmatched_tier` from the YAML if set, otherwise T1.
+
+</details>
 
 | Tier                        | Required                | Trigger                                                                  |
 | --------------------------- | ----------------------- | ------------------------------------------------------------------------ |
