@@ -26,8 +26,10 @@ export function SignInButton({
     try {
       await authClient.signIn.oauth2({ providerId: "keycloak", callbackURL: "/" });
     } catch {
-      // Sign-in redirect failed (e.g. Keycloak unreachable); surface the error and re-enable the button.
+      // Sign-in redirect failed (e.g. Keycloak unreachable); surface the error.
       setError("We couldn't start the sign-in process. Please try again.");
+    } finally {
+      // Always re-enable: the flow may resolve client-side without navigating away.
       setIsPending(false);
     }
   }
