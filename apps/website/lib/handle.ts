@@ -5,6 +5,11 @@ import { slugify } from "./slug";
 // the DB unique constraint is the backstop for the unlikely collision.
 const RANDOM_HANDLE_LENGTH = 12;
 
+// Upper bound on collision-suffix attempts. A free slot effectively always
+// exists, so hitting this means something is wrong (e.g. a misbehaving
+// `isTaken`); failing loudly beats an unbounded hang on the request path.
+const MAX_HANDLE_SUFFIX = 100;
+
 /** Identity fields a handle can be derived from, in order of preference. */
 export type HandleSource = {
   email?: string | null;
@@ -43,10 +48,14 @@ export async function generateUniqueHandle(
     return base;
   }
 
-  for (let suffix = 2; ; suffix++) {
+  for (let suffix = 2; suffix <= MAX_HANDLE_SUFFIX; suffix++) {
     const candidate = `${base}-${suffix}`;
     if (!(await isTaken(candidate))) {
       return candidate;
     }
   }
+
+  throw new Error(
+    `Could not find a unique handle for "${base}" after ${MAX_HANDLE_SUFFIX} attempts`,
+  );
 }

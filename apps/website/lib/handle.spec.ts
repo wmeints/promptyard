@@ -19,12 +19,20 @@ describe("deriveBaseHandle", () => {
     expect(deriveBaseHandle({ name: "Jane Doe" })).toBe("jane-doe");
   });
 
-  it("falls back to a non-empty random token when email and name yield nothing", () => {
+  it("falls back to a hex random token when email and name yield nothing", () => {
     expect(deriveBaseHandle({ email: "+++@example.org", name: "***" })).toMatch(/^[0-9a-f]{12}$/);
   });
 
+  it("falls back to a random token when only a symbol-only name is provided", () => {
+    expect(deriveBaseHandle({ name: "***" })).toMatch(/^[0-9a-f]{12}$/);
+  });
+
   it("never returns an empty handle when no identity is provided", () => {
-    expect(deriveBaseHandle({})).toMatch(/^[a-z0-9]+$/);
+    expect(deriveBaseHandle({})).toMatch(/^[0-9a-f]{12}$/);
+  });
+
+  it("treats explicit null email and name like missing fields", () => {
+    expect(deriveBaseHandle({ email: null, name: null })).toMatch(/^[0-9a-f]{12}$/);
   });
 });
 
@@ -47,5 +55,11 @@ describe("generateUniqueHandle", () => {
     const taken = new Set(["jane"]);
     const handle = await generateUniqueHandle({ email: "jane@x.io" }, async (c) => taken.has(c));
     expect(handle).toBe("jane-2");
+  });
+
+  it("throws instead of looping forever when every candidate is taken", async () => {
+    await expect(generateUniqueHandle({ email: "jane@x.io" }, async () => true)).rejects.toThrow(
+      /unique handle/,
+    );
   });
 });
