@@ -10,12 +10,15 @@ interface SignInButtonProps {
   label?: string;
   size?: "default" | "lg";
   className?: string;
+  /** Where to return after a successful sign-in. Defaults to the home page. */
+  callbackURL?: string;
 }
 
 export function SignInButton({
   label = "Sign in",
   size = "default",
   className,
+  callbackURL = "/",
 }: SignInButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const { setError, clearError } = useAppError();
@@ -24,7 +27,7 @@ export function SignInButton({
     setIsPending(true);
     clearError();
     try {
-      await authClient.signIn.oauth2({ providerId: "keycloak", callbackURL: "/" });
+      await authClient.signIn.oauth2({ providerId: "keycloak", callbackURL });
     } catch {
       // Sign-in redirect failed (e.g. Keycloak unreachable); surface the error.
       setError("We couldn't start the sign-in process. Please try again.");

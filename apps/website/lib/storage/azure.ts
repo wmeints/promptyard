@@ -38,7 +38,13 @@ export function createAzureBlobStorage(config: AzureBlobConfig): BlobStorage {
     async put(key, data, contentType) {
       const blob = container.getBlockBlobClient(key);
       await blob.uploadData(data, {
-        blobHTTPHeaders: contentType ? { blobContentType: contentType } : undefined,
+        blobHTTPHeaders: {
+          // Uploaded files are inert content. Default to a non-active content
+          // type and always force a download so a blob can never be served as
+          // active/executable content, whatever a caller passes in.
+          blobContentType: contentType ?? "application/octet-stream",
+          blobContentDisposition: "attachment",
+        },
       });
     },
 

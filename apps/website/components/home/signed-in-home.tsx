@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 import { ContentCard } from "@/components/home/content-card";
 import { recentUpdates } from "@/components/home/mock-data";
@@ -22,9 +23,11 @@ function UploadHero() {
           profile.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button>
-            <Plus />
-            Upload
+          <Button asChild>
+            <Link href="/upload">
+              <Plus />
+              Upload
+            </Link>
           </Button>
           <Button variant="outline">Import from file</Button>
         </div>
