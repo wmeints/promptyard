@@ -310,10 +310,39 @@ export function parseBaseArg(args: string[], defaultBase = DEFAULT_BASE_REF): st
   return base;
 }
 
-export function isMainEntry(): boolean {
-  return typeof Bun !== "undefined"
-    ? Bun.main === import.meta.path
-    : process.argv[1] === import.meta.filename;
+export function isMainEntry(expectedFileName?: string): boolean {
+  const argvEntry = process.argv[1];
+  if (!argvEntry) {
+    return false;
+  }
+
+  const normalizePath = (value: string): string =>
+    value.replace(/^file:\/\//, "").replace(/\\/g, "/");
+
+  const argvNormalized = normalizePath(argvEntry);
+  if (expectedFileName) {
+    return (
+      argvNormalized === expectedFileName ||
+      argvNormalized.endsWith(`/${expectedFileName}`)
+    );
+  }
+
+  const candidates = [
+    (import.meta as { path?: string }).path,
+    (import.meta as { filename?: string }).filename,
+    (import.meta as { file?: string }).file,
+    (import.meta as { url?: string }).url,
+  ]
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .map(normalizePath);
+
+  return candidates.some((candidate) => {
+    if (argvNormalized === candidate) {
+      return true;
+    }
+    const fileName = candidate.split("/").pop();
+    return Boolean(fileName) && argvNormalized.endsWith(`/${fileName}`);
+  });
 }
 
 function main() {
@@ -327,6 +356,6 @@ function main() {
   console.log(JSON.stringify(result, null, 2));
 }
 
-if (isMainEntry()) {
+if (isMainEntry("compute-tier.ts")) {
   main();
 }
