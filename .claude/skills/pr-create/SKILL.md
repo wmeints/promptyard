@@ -1,6 +1,6 @@
 ---
 name: pr-create
-description: Open a pull request from the changes on the branch you are currently working on, with a properly structured description and a computed review-tier assessment. Use this whenever the user says "open a PR", "create a pull request", "raise a PR for this", "ship this branch", or finishes a piece of work and wants it submitted for review. The skill inspects the branch diff, computes the review tier from risk-rules.yml (impact floor + complexity + blast radius), fills the PR body template, and creates the PR with the gh CLI — including tier labels and reviewer requests for changes that need a human. Prefer this over a bare `gh pr create` so the description and tier are never skipped.
+description: Open a pull request from the changes on the branch you are currently working on, with a properly structured description and a computed review-tier assessment. Use this whenever the user says "open a PR", "create a pull request", "raise a PR for this", "ship this branch", or finishes a piece of work and wants it submitted for review. The skill inspects the branch diff and provides the required LLM escalation signal in the PR body marker. GitHub Actions computes and enforces the deterministic final tier, label, and reviewer requirement. Prefer this over a bare `gh pr create` so the description and tier metadata are never skipped.
 ---
 
 # Create a Pull Request
@@ -10,8 +10,8 @@ decide _how_ to engage before reading a line of the diff. The description carrie
 a **computed review tier** so high-impact changes can't slip through as if they
 were trivial.
 
-This skill authors PRs. The tiering logic it uses is the same as the review side,
-so both read one `risk-rules.yml` and never disagree on a tier.
+This skill authors PRs. Final tiering is computed and enforced in CI from one
+`risk-rules.yml` source of truth.
 
 ## Honesty rule (read first)
 
@@ -54,7 +54,7 @@ git diff <base>...HEAD --stat
 git diff <base>...HEAD
 ```
 
-This is the input to the tier computation and the "What" summary.
+This is the input to the CI tier computation and the "What" summary.
 
 ### 4. Run the verification you intend to claim
 
@@ -63,42 +63,21 @@ type-check) if they exist and are runnable. Capture the exact commands and resul
 — they go verbatim into the body. If something can't be run, say why rather than
 guessing the outcome.
 
-### 5. Compute the review tier
+### 5. Provide LLM escalation signal
 
-Run the deterministic tier-computation script to get the impact floor:
+Choose exactly one LLM escalation value:
+`NONE`, `T1`, `T2`, or `T3`.
+This value is advisory and can only escalate upward in CI.
 
-```bash
-bun run .claude/skills/pr-create/scripts/compute-tier.ts --base <base>
+Add this machine-readable marker to the PR body (for CI enforcement):
+
+```md
+<!-- llm_escalation: NONE|T1|T2|T3 -->
 ```
 
-This outputs JSON with `floor`, `fired_rules`, and `changed_files`. Use the
-script's output as the **authoritative impact floor** — do not re-derive it
-yourself. If the script errors, fall back to manual computation (see below).
-
-Then apply semantic escalation on top of the script's floor:
-
-1. **Impact floor** — taken directly from the script output. Record which rule
-   fired and which file triggered it (both are in the JSON). If `fired_rules` is
-   empty, record "No risk rule matched; default unmatched tier used."
-2. **Complexity** — if high (non-local reasoning, novel logic, cross-cutting),
-   raise the impact floor by one tier, capped at T3. Example: T1→T2, T2→T3, T3 stays T3.
-3. **Blast radius** — destructive/irreversible (data migration, irreversible side
-   effect) → **T3**.
-
-**Final tier = max(impact floor, complexity escalation, blast-radius escalation).**
-
-You may escalate above the floor; you must **never** route below it. If you were
-tempted to ("this auth change is tiny"), note it in the PR instead of acting on it
-— size never lowers an impact floor.
-
-<details><summary>Manual fallback (if script fails)</summary>
-
-Load `risk-rules.yml` from the repo root or `.github/`. For each rule,
-glob-match its `paths` against changed files. Every match contributes its
-`min_tier`. The floor is the highest `min_tier` triggered. No match → use
-`defaults.unmatched_tier` from the YAML if set, otherwise T1.
-
-</details>
+Use the exact value you selected. GitHub Actions then computes final tier
+deterministically from trusted scripts and enforces canonical `review:T*`
+labels and reviewer requirements.
 
 | Tier                        | Required                | Trigger                                                                  |
 | --------------------------- | ----------------------- | ------------------------------------------------------------------------ |
@@ -116,7 +95,7 @@ Use `assets/pr-body-template.md`. Fill every section from real data:
 - **Why / What** — from the linked issue and the diff, in your own words.
 - **Proof it works** — only the boxes you actually verified, with the commands.
 - **AI role** — honest split of agent-generated vs hand-written.
-- **Review tier** — the computed block, with the rule + file that set the floor.
+- **Review tier input** — include the chosen `llm_escalation` value.
 - **Quality goals touched** — checked from the rules that fired.
 - **Rollback plan** — required if T3 or destructive.
 - **Review focus** — the 1–2 areas you most want human eyes on.
@@ -124,7 +103,7 @@ Use `assets/pr-body-template.md`. Fill every section from real data:
 ### 7. Create the PR
 
 Write the filled body to a temp file and create the PR. Set draft status for T0 or
-when checks are red. Add a tier label and request review when a human is required:
+when checks are red.
 
 ```bash
 gh pr create \
@@ -132,17 +111,12 @@ gh pr create \
   --head "$(git branch --show-current)" \
   --title "<type>(<scope>): <concise summary>" \
   --body-file /tmp/pr-body.md \
-  --label "review:T<N>" \
   ${REVIEWER:+--reviewer "$REVIEWER"} \
   ${DRAFT:+--draft}
 ```
 
-- **T1** — no reviewer required; the label signals agent-only is sufficient.
-- **T2 / T3** — request a human reviewer. If the user named one use it; otherwise
-  fall back to CODEOWNERS for the touched paths, and if none, ask the user who
-  should review rather than guessing.
-
-Create the `review:T1/T2/T3` labels first if they don't exist (`gh label create`).
+CI enforcement will set/sync the canonical `review:T1/T2/T3` label and fail if
+required reviewer conditions are not met.
 
 ### 8. Report back
 
