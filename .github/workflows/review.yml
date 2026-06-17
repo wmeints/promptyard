@@ -51,21 +51,29 @@ jobs:
           RESULT="$(bun run scripts/compute-final-tier.ts --base "$BASE_REF" "${{ steps.marker.outputs.llm_escalation }}")"
           printf '%s\n' "$RESULT" > tier-result.json
 
-          FINAL_TIER="$(jq -r '.final_tier' tier-result.json)"
-          REVIEW_LABEL="$(jq -r '.review_label' tier-result.json)"
-          HUMAN_REQUIRED="$(jq -r '.human_review_required' tier-result.json)"
+          node -e '
+            const fs = require("node:fs");
+            const outPath = process.env.GITHUB_OUTPUT;
+            const raw = fs.readFileSync("tier-result.json", "utf8");
+            const data = JSON.parse(raw);
 
-          if [ -z "$FINAL_TIER" ] || [ "$FINAL_TIER" = "null" ] || \
-             ! [[ "$FINAL_TIER" =~ ^T[123]$ ]] || \
-             ! [[ "$REVIEW_LABEL" =~ ^review:T[123]$ ]] || \
-             ! [[ "$HUMAN_REQUIRED" =~ ^(true|false)$ ]]; then
-            echo "Invalid compute-final-tier output"
-            exit 1
-          fi
+            const finalTier = data.final_tier;
+            const reviewLabel = data.review_label;
+            const humanRequired = data.human_review_required;
 
-          echo "final_tier=$FINAL_TIER" >> "$GITHUB_OUTPUT"
-          echo "review_label=$REVIEW_LABEL" >> "$GITHUB_OUTPUT"
-          echo "human_review_required=$HUMAN_REQUIRED" >> "$GITHUB_OUTPUT"
+            const validTier = /^(T1|T2|T3)$/.test(String(finalTier || ""));
+            const validLabel = /^review:T[123]$/.test(String(reviewLabel || ""));
+            const validHuman = typeof humanRequired === "boolean";
+            if (!validTier || !validLabel || !validHuman) {
+              console.error("Invalid compute-final-tier output:");
+              console.error(raw);
+              process.exit(1);
+            }
+
+            fs.appendFileSync(outPath, `final_tier=${finalTier}\n`);
+            fs.appendFileSync(outPath, `review_label=${reviewLabel}\n`);
+            fs.appendFileSync(outPath, `human_review_required=${humanRequired}\n`);
+          '
 
       - name: Ensure review tier labels exist
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
