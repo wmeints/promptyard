@@ -134,6 +134,6 @@ function main() {
   console.log(JSON.stringify(finalResult, null, 2));
 }
 
-if (isMainEntry()) {
+if (isMainEntry("compute-final-tier.ts")) {
   main();
 }
