@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
-      issues: write
+      pull-requests: read
+      issues: read
     outputs:
       final_tier: ${{ steps.compute.outputs.final_tier }}
       review_label: ${{ steps.compute.outputs.review_label }}
@@ -101,7 +101,9 @@ jobs:
           REVIEW_LABEL="$(jq -r '.review_label' tier-result.json)"
           HUMAN_REQUIRED="$(jq -r '.human_review_required' tier-result.json)"
 
-          if [ "$FINAL_TIER" = "null" ] || [ "$REVIEW_LABEL" = "null" ] || [ "$HUMAN_REQUIRED" = "null" ]; then
+          if [ -z "$FINAL_TIER" ] || [ "$FINAL_TIER" = "null" ] || \
+             [ -z "$REVIEW_LABEL" ] || [ "$REVIEW_LABEL" = "null" ] || \
+             [ -z "$HUMAN_REQUIRED" ] || [ "$HUMAN_REQUIRED" = "null" ]; then
             echo "Invalid compute-final-tier output"
             exit 1
           fi
@@ -111,7 +113,8 @@ jobs:
           echo "human_review_required=$HUMAN_REQUIRED" >> "$GITHUB_OUTPUT"
 
       - name: Ensure review tier labels exist
-        uses: actions/github-script@v7
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: actions/github-script@v8
         with:
           script: |
             const labels = ["review:T1", "review:T2", "review:T3"];
@@ -135,12 +138,17 @@ jobs:
             }
 
       - name: Sync deterministic review label
-        uses: actions/github-script@v7
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: actions/github-script@v8
         env:
           EXPECTED_LABEL: ${{ steps.compute.outputs.review_label }}
         with:
           script: |
             const expected = process.env.EXPECTED_LABEL;
+            if (!expected || !/^review:T[123]$/.test(expected)) {
+              core.setFailed(`Invalid expected review label: '${expected ?? ""}'`);
+              return;
+            }
             const issue_number = context.payload.pull_request.number;
             const { data: issue } = await github.rest.issues.get({
               owner: context.repo.owner,
@@ -158,6 +166,27 @@ jobs:
               issue_number,
               labels: nextLabels,
             });
+
+      - name: Enforce review label consistency (fork PRs)
+        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        shell: bash
+        env:
+          EXPECTED_LABEL: ${{ steps.compute.outputs.review_label }}
+          CURRENT_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          if [ -z "$EXPECTED_LABEL" ]; then
+            echo "Expected label from deterministic gate is empty"
+            exit 1
+          fi
+          CURRENT_REVIEW_LABEL="$(echo "$CURRENT_LABELS" | jq -r '[.[] | select(test("^review:T[123]$"))][0] // ""')"
+          if [ -z "$CURRENT_REVIEW_LABEL" ]; then
+            echo "Fork PR cannot be auto-labeled by GITHUB_TOKEN. Add '$EXPECTED_LABEL' label manually."
+            exit 1
+          fi
+          if [ "$CURRENT_REVIEW_LABEL" != "$EXPECTED_LABEL" ]; then
+            echo "Tier label mismatch. Expected '$EXPECTED_LABEL', found '$CURRENT_REVIEW_LABEL'."
+            exit 1
+          fi
 
       - name: Enforce human reviewer requirement
         shell: bash
