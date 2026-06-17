@@ -72,7 +72,7 @@ jobs:
       - name: Install trusted tier gate dependencies
         shell: bash
         working-directory: ${{ steps.trusted.outputs.tools_dir }}
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Read LLM escalation marker from PR body
         id: marker
