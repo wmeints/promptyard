@@ -1,21 +1,33 @@
-import { zipSync, type ZipAttributes } from "fflate";
+// @vitest-environment node
+import AdmZip from "adm-zip";
 import { describe, expect, it } from "vitest";
 
 import { UploadRejectedError } from "./errors";
 import { UPLOAD_LIMITS } from "./limits";
 import { isUnsafePath, unzipSafely } from "./zip";
 
-type Entry = Uint8Array | [Uint8Array, ZipAttributes];
+// External attribute carrying a Unix symlink mode (S_IFLNK | 0777) in its high
+// 16 bits — the bit pattern unzipSafely treats as a symlink.
+const SYMLINK_ATTR = (0o120777 << 16) >>> 0;
 
-function zip(entries: Record<string, Entry>): Uint8Array {
-  return zipSync(entries);
+type FixtureEntry = { data?: Buffer; name?: string; symlink?: boolean };
+
+const text = (value: string) => Buffer.from(value);
+
+// adm-zip's addFile sanitises `..`/leading-slash names, so unsafe paths are set
+// directly on the entry to reproduce what a malicious archive would carry.
+function zip(entries: Record<string, FixtureEntry>): Uint8Array {
+  const archive = new AdmZip();
+  let index = 0;
+  for (const [key, entry] of Object.entries(entries)) {
+    const created = archive.addFile(`placeholder-${index++}`, entry.data ?? text("x"));
+    created.entryName = entry.name ?? key;
+    if (entry.symlink) {
+      created.attr = SYMLINK_ATTR;
+    }
+  }
+  return archive.toBuffer();
 }
-
-const text = (value: string) => new TextEncoder().encode(value);
-
-// Unix mode for a symlink (S_IFLNK | 0777) lives in the high 16 bits of the
-// external attributes; `os: 3` (Unix) is required for it to be written.
-const SYMLINK_ATTRS: ZipAttributes = { os: 3, attrs: 0o120777 << 16 };
 
 function rejectionReason(run: () => void): unknown {
   try {
@@ -47,9 +59,12 @@ describe("isUnsafePath", () => {
 });
 
 describe("unzipSafely", () => {
-  it("returns regular files keyed by path and drops directory entries", () => {
+  it("returns regular files keyed by path", () => {
     const files = unzipSafely(
-      zip({ "skills/demo/SKILL.md": text("hello"), "skills/demo/scripts/run.sh": text("echo") }),
+      zip({
+        "skills/demo/SKILL.md": { data: text("hello") },
+        "skills/demo/scripts/run.sh": { data: text("echo") },
+      }),
     );
 
     expect([...files.keys()].sort()).toEqual([
@@ -67,29 +82,29 @@ describe("unzipSafely", () => {
   });
 
   it("rejects a path-traversal entry", () => {
-    const error = rejectionReason(() => unzipSafely(zip({ "../escape.txt": text("x") })));
+    const error = rejectionReason(() => unzipSafely(zip({ escape: { name: "../escape.txt" } })));
     expect(error).toBeInstanceOf(UploadRejectedError);
     expect((error as UploadRejectedError).reason).toBe("unsafe-path");
   });
 
   it("rejects an absolute-path entry", () => {
-    const error = rejectionReason(() => unzipSafely(zip({ "/etc/passwd": text("x") })));
+    const error = rejectionReason(() => unzipSafely(zip({ passwd: { name: "/etc/passwd" } })));
     expect(error).toBeInstanceOf(UploadRejectedError);
     expect((error as UploadRejectedError).reason).toBe("unsafe-path");
   });
 
   it("rejects a symlink entry", () => {
     const error = rejectionReason(() =>
-      unzipSafely(zip({ "skills/demo/link": [text("/etc/passwd"), SYMLINK_ATTRS] })),
+      unzipSafely(zip({ "skills/demo/link": { data: text("/etc/passwd"), symlink: true } })),
     );
     expect(error).toBeInstanceOf(UploadRejectedError);
     expect((error as UploadRejectedError).reason).toBe("symlink");
   });
 
   it("rejects an archive with too many files", () => {
-    const entries: Record<string, Entry> = {};
+    const entries: Record<string, FixtureEntry> = {};
     for (let index = 0; index <= UPLOAD_LIMITS.maxFiles; index++) {
-      entries[`skills/demo/file-${index}.txt`] = text("x");
+      entries[`skills/demo/file-${index}.txt`] = { data: text("x") };
     }
     const error = rejectionReason(() => unzipSafely(zip(entries)));
     expect(error).toBeInstanceOf(UploadRejectedError);
@@ -97,8 +112,8 @@ describe("unzipSafely", () => {
   });
 
   it("rejects a single file over the per-file ceiling", () => {
-    const big = new Uint8Array(UPLOAD_LIMITS.maxFileBytes + 1);
-    const error = rejectionReason(() => unzipSafely(zip({ "skills/demo/big.bin": big })));
+    const big = Buffer.alloc(UPLOAD_LIMITS.maxFileBytes + 1);
+    const error = rejectionReason(() => unzipSafely(zip({ "skills/demo/big.bin": { data: big } })));
     expect(error).toBeInstanceOf(UploadRejectedError);
     expect((error as UploadRejectedError).reason).toBe("file-too-large");
   });
@@ -106,10 +121,10 @@ describe("unzipSafely", () => {
   it("rejects an archive whose uncompressed size exceeds the ceiling (zip bomb)", () => {
     // Each file sits at the per-file ceiling; enough of them to clear the
     // uncompressed total. Highly compressible, so the archive stays tiny.
-    const entries: Record<string, Entry> = {};
+    const entries: Record<string, FixtureEntry> = {};
     const fileCount = Math.ceil(UPLOAD_LIMITS.maxUncompressedBytes / UPLOAD_LIMITS.maxFileBytes) + 1;
     for (let index = 0; index < fileCount; index++) {
-      entries[`skills/demo/file-${index}.bin`] = new Uint8Array(UPLOAD_LIMITS.maxFileBytes);
+      entries[`skills/demo/file-${index}.bin`] = { data: Buffer.alloc(UPLOAD_LIMITS.maxFileBytes) };
     }
     const error = rejectionReason(() => unzipSafely(zip(entries)));
     expect(error).toBeInstanceOf(UploadRejectedError);
@@ -117,7 +132,7 @@ describe("unzipSafely", () => {
   });
 
   it("rejects a file that is not a zip", () => {
-    const error = rejectionReason(() => unzipSafely(text("not a zip at all")));
+    const error = rejectionReason(() => unzipSafely(new Uint8Array(text("not a zip at all"))));
     expect(error).toBeInstanceOf(UploadRejectedError);
     expect((error as UploadRejectedError).reason).toBe("invalid-zip");
   });

@@ -1,4 +1,5 @@
-import { zipSync } from "fflate";
+// @vitest-environment node
+import AdmZip from "adm-zip";
 import { describe, expect, it, vi } from "vitest";
 
 import type { UploadResult } from "@/db/schema";
@@ -6,13 +7,15 @@ import type { BlobStorage } from "@/lib/storage/blob";
 
 import { processSkillUpload, type SkillVersionRecord, type UploadStore } from "./upload";
 
-const text = (value: string) => new TextEncoder().encode(value);
-
-const skillZip = () =>
-  zipSync({
-    "skills/My Demo/SKILL.md": text("---\nname: My Demo\ndescription: A demo skill\n---\nBody"),
-    "skills/My Demo/scripts/run.sh": text("echo hi"),
-  });
+const skillZip = () => {
+  const zip = new AdmZip();
+  zip.addFile(
+    "skills/My Demo/SKILL.md",
+    Buffer.from("---\nname: My Demo\ndescription: A demo skill\n---\nBody"),
+  );
+  zip.addFile("skills/My Demo/scripts/run.sh", Buffer.from("echo hi"));
+  return new Uint8Array(zip.toBuffer());
+};
 
 function fakeStore(overrides: Partial<UploadStore> = {}): UploadStore {
   let counter = 0;

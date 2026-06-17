@@ -35,7 +35,7 @@ export type UploadStore = {
   saveUploadRequest: (ownerId: string, results: UploadResult[]) => Promise<string>;
 };
 
-// fflate inflates into plain `Uint8Array`s; the blob API wants the
+// Unzipped entries are plain `Uint8Array`s; the blob API wants the
 // `ArrayBuffer`-backed variant, which they always are.
 function asBytes(data: Uint8Array): Uint8Array<ArrayBuffer> {
   return data as Uint8Array<ArrayBuffer>;
