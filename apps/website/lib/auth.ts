@@ -41,7 +41,7 @@ export const auth = betterAuth({
         // created. The unique constraint is the final guard against the small
         // race between the existence check and the insert.
         before: async (newUser) => ({
-          data: { ...newUser, handle: await generateUniqueHandle(newUser.email, handleExists) },
+          data: { ...newUser, handle: await generateUniqueHandle(newUser, handleExists) },
         }),
       },
     },
