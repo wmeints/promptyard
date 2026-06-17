@@ -101,9 +101,22 @@ jobs:
           REVIEW_LABEL="$(jq -r '.review_label' tier-result.json)"
           HUMAN_REQUIRED="$(jq -r '.human_review_required' tier-result.json)"
 
+          # Backward compatibility: older trusted script versions may only emit final_tier.
+          if [ -z "$REVIEW_LABEL" ] || [ "$REVIEW_LABEL" = "null" ]; then
+            REVIEW_LABEL="review:$FINAL_TIER"
+          fi
+          if [ -z "$HUMAN_REQUIRED" ] || [ "$HUMAN_REQUIRED" = "null" ]; then
+            if [ "$FINAL_TIER" = "T1" ]; then
+              HUMAN_REQUIRED="false"
+            else
+              HUMAN_REQUIRED="true"
+            fi
+          fi
+
           if [ -z "$FINAL_TIER" ] || [ "$FINAL_TIER" = "null" ] || \
-             [ -z "$REVIEW_LABEL" ] || [ "$REVIEW_LABEL" = "null" ] || \
-             [ -z "$HUMAN_REQUIRED" ] || [ "$HUMAN_REQUIRED" = "null" ]; then
+             ! [[ "$FINAL_TIER" =~ ^T[123]$ ]] || \
+             ! [[ "$REVIEW_LABEL" =~ ^review:T[123]$ ]] || \
+             ! [[ "$HUMAN_REQUIRED" =~ ^(true|false)$ ]]; then
             echo "Invalid compute-final-tier output"
             exit 1
           fi
