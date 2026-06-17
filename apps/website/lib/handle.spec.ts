@@ -20,7 +20,7 @@ describe("deriveBaseHandle", () => {
   });
 
   it("falls back to a non-empty random token when email and name yield nothing", () => {
-    expect(deriveBaseHandle({ email: "+++@example.org", name: "***" })).toMatch(/^[a-z0-9]+$/);
+    expect(deriveBaseHandle({ email: "+++@example.org", name: "***" })).toMatch(/^[0-9a-f]{12}$/);
   });
 
   it("never returns an empty handle when no identity is provided", () => {
