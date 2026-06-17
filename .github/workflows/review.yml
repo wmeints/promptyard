@@ -76,7 +76,6 @@ jobs:
           '
 
       - name: Ensure review tier labels exist
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         uses: actions/github-script@v8
         with:
           script: |
@@ -101,7 +100,6 @@ jobs:
             }
 
       - name: Sync deterministic review label
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         uses: actions/github-script@v8
         env:
           EXPECTED_LABEL: ${{ steps.compute.outputs.review_label }}
@@ -129,27 +127,6 @@ jobs:
               issue_number,
               labels: nextLabels,
             });
-
-      - name: Enforce review label consistency (fork PRs)
-        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
-        shell: bash
-        env:
-          EXPECTED_LABEL: ${{ steps.compute.outputs.review_label }}
-          CURRENT_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
-        run: |
-          if [ -z "$EXPECTED_LABEL" ]; then
-            echo "Expected label from deterministic gate is empty"
-            exit 1
-          fi
-          CURRENT_REVIEW_LABEL="$(echo "$CURRENT_LABELS" | jq -r '[.[] | select(test("^review:T[123]$"))][0] // ""')"
-          if [ -z "$CURRENT_REVIEW_LABEL" ]; then
-            echo "Fork PR cannot be auto-labeled by GITHUB_TOKEN. Add '$EXPECTED_LABEL' label manually."
-            exit 1
-          fi
-          if [ "$CURRENT_REVIEW_LABEL" != "$EXPECTED_LABEL" ]; then
-            echo "Tier label mismatch. Expected '$EXPECTED_LABEL', found '$CURRENT_REVIEW_LABEL'."
-            exit 1
-          fi
 
       - name: Enforce human reviewer requirement
         shell: bash
