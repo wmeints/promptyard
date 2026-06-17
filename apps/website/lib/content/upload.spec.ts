@@ -5,17 +5,24 @@ import { describe, expect, it, vi } from "vitest";
 import type { UploadResult } from "@/db/schema";
 import type { BlobStorage } from "@/lib/storage/blob";
 
-import { processSkillUpload, type SkillVersionRecord, type UploadStore } from "./upload";
+import { UploadRejectedError } from "./errors";
+import { processSkillUpload, type UploadStore } from "./upload";
 
-const skillZip = () => {
+type SkillSpec = { folder: string; manifest: string; extra?: Record<string, string> };
+
+const manifest = (name: string, description: string) =>
+  `---\nname: ${name}\ndescription: ${description}\n---\nBody`;
+
+function skillZip(...skills: SkillSpec[]): Uint8Array {
   const zip = new AdmZip();
-  zip.addFile(
-    "skills/My Demo/SKILL.md",
-    Buffer.from("---\nname: My Demo\ndescription: A demo skill\n---\nBody"),
-  );
-  zip.addFile("skills/My Demo/scripts/run.sh", Buffer.from("echo hi"));
+  for (const skill of skills) {
+    zip.addFile(`skills/${skill.folder}/SKILL.md`, Buffer.from(skill.manifest));
+    for (const [relpath, body] of Object.entries(skill.extra ?? {})) {
+      zip.addFile(`skills/${skill.folder}/${relpath}`, Buffer.from(body));
+    }
+  }
   return new Uint8Array(zip.toBuffer());
-};
+}
 
 function fakeStore(overrides: Partial<UploadStore> = {}): UploadStore {
   let counter = 0;
@@ -26,54 +33,102 @@ function fakeStore(overrides: Partial<UploadStore> = {}): UploadStore {
       delete: vi.fn<BlobStorage["delete"]>(async () => {}),
     },
     newId: vi.fn<() => string>(() => `id-${++counter}`),
+    createUploadRequest: vi.fn<UploadStore["createUploadRequest"]>(async () => "batch-1"),
     saveSkillVersion: vi.fn<UploadStore["saveSkillVersion"]>(async () => {}),
-    saveUploadRequest: vi.fn<UploadStore["saveUploadRequest"]>(async () => "batch-1"),
+    updateUploadRequest: vi.fn<UploadStore["updateUploadRequest"]>(async () => {}),
     ...overrides,
   };
 }
 
+const lastResults = (store: UploadStore): UploadResult[] =>
+  vi.mocked(store.updateUploadRequest).mock.lastCall?.[1] ?? [];
+
 describe("processSkillUpload", () => {
-  it("writes one blob per file and persists a transactional version", async () => {
+  it("creates the audit row up front, writes blobs, and records a created result", async () => {
     const store = fakeStore();
 
-    const batchId = await processSkillUpload("owner-1", skillZip(), store);
-
-    expect(batchId).toBe("batch-1");
-    expect(store.storage.put).toHaveBeenCalledTimes(2);
-    expect(store.storage.put).toHaveBeenCalledWith(
-      "content/id-1/id-2/SKILL.md",
-      expect.any(Uint8Array),
-      "application/octet-stream",
+    const batchId = await processSkillUpload(
+      "owner-1",
+      skillZip({
+        folder: "My Demo",
+        manifest: manifest("My Demo", "A demo skill"),
+        extra: { "scripts/run.sh": "echo hi" },
+      }),
+      store,
     );
 
-    const record = vi.mocked(store.saveSkillVersion).mock.calls[0][0] as SkillVersionRecord;
-    expect(record).toMatchObject({
-      ownerId: "owner-1",
-      contentId: "id-1",
-      versionId: "id-2",
-      slug: "my-demo",
-      description: "A demo skill",
-    });
-    expect(record.manifest.map((entry) => entry.path)).toEqual(["SKILL.md", "scripts/run.sh"]);
-
-    const results = vi.mocked(store.saveUploadRequest).mock.calls[0][1] as UploadResult[];
-    expect(results).toEqual([
+    expect(batchId).toBe("batch-1");
+    expect(store.createUploadRequest).toHaveBeenCalledWith("owner-1", 1);
+    // The audit row is created before any skill is persisted.
+    expect(vi.mocked(store.createUploadRequest).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(store.saveSkillVersion).mock.invocationCallOrder[0],
+    );
+    expect(store.storage.put).toHaveBeenCalledTimes(2);
+    expect(lastResults(store)).toEqual([
       { type: "skill", name: "my-demo", status: "created", contentId: "id-1" },
     ]);
   });
 
-  it("deletes the just-written blobs when persistence fails", async () => {
+  it("continues past a failing skill, recording it as failed and cleaning up its blobs", async () => {
     const store = fakeStore({
-      saveSkillVersion: vi.fn<UploadStore["saveSkillVersion"]>(async () => {
-        throw new Error("db is down");
+      saveSkillVersion: vi.fn<UploadStore["saveSkillVersion"]>(async (record) => {
+        if (record.slug === "bravo") {
+          throw new UploadRejectedError("duplicate-name", 'You already have a skill named "bravo".');
+        }
       }),
     });
 
-    await expect(processSkillUpload("owner-1", skillZip(), store)).rejects.toThrow("db is down");
+    const batchId = await processSkillUpload(
+      "owner-1",
+      skillZip(
+        { folder: "alpha", manifest: manifest("alpha", "first") },
+        { folder: "bravo", manifest: manifest("bravo", "second") },
+      ),
+      store,
+    );
 
-    expect(store.storage.delete).toHaveBeenCalledTimes(2);
-    expect(store.storage.delete).toHaveBeenCalledWith("content/id-1/id-2/SKILL.md");
-    expect(store.storage.delete).toHaveBeenCalledWith("content/id-1/id-2/scripts/run.sh");
-    expect(store.saveUploadRequest).not.toHaveBeenCalled();
+    expect(batchId).toBe("batch-1");
+    expect(store.createUploadRequest).toHaveBeenCalledWith("owner-1", 2);
+    // bravo's just-written blob is cleaned up; alpha's is not.
+    expect(store.storage.delete).toHaveBeenCalledTimes(1);
+    expect(lastResults(store)).toEqual([
+      { type: "skill", name: "alpha", status: "created", contentId: "id-1" },
+      {
+        type: "skill",
+        name: "bravo",
+        status: "failed",
+        message: 'You already have a skill named "bravo".',
+      },
+    ]);
+  });
+
+  it("records a skill with invalid frontmatter as failed without writing blobs for it", async () => {
+    const store = fakeStore();
+
+    await processSkillUpload(
+      "owner-1",
+      skillZip(
+        { folder: "good", manifest: manifest("good", "valid") },
+        { folder: "bad", manifest: "---\nname: Bad\n---\nNo description" },
+      ),
+      store,
+    );
+
+    // Folders are processed in sorted order: "bad" before "good".
+    const results = lastResults(store);
+    expect(results[0]).toMatchObject({ name: "bad", status: "failed" });
+    expect(results[1]).toMatchObject({ name: "good", status: "created" });
+    // Only the good skill's SKILL.md is written; the bad one never reaches storage.
+    expect(store.storage.put).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects an archive with no skill before creating an audit row", async () => {
+    const store = fakeStore();
+    const emptyZip = new Uint8Array(new AdmZip().toBuffer());
+
+    await expect(processSkillUpload("owner-1", emptyZip, store)).rejects.toBeInstanceOf(
+      UploadRejectedError,
+    );
+    expect(store.createUploadRequest).not.toHaveBeenCalled();
   });
 });

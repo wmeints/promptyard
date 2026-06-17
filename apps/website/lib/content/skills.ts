@@ -21,7 +21,38 @@ function nonEmpty(value: string | undefined): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-function parseSkill(folder: string, files: Map<string, Uint8Array>): ParsedSkill {
+/**
+ * List the skill folders in an unzipped archive — every `skills/<folder>/`
+ * holding a SKILL.md, sorted for deterministic processing. Throws
+ * {@link UploadRejectedError} only when the archive has no skill at all; a single
+ * malformed skill is left for {@link parseSkill} to reject per-item.
+ */
+export function findSkillFolders(files: Map<string, Uint8Array>): string[] {
+  const folders: string[] = [];
+  for (const path of files.keys()) {
+    const match = SKILL_MANIFEST.exec(path);
+    if (match) {
+      folders.push(match[1]);
+    }
+  }
+
+  if (folders.length === 0) {
+    throw new UploadRejectedError(
+      "no-skill",
+      "The archive does not contain a skills/<name>/SKILL.md file.",
+    );
+  }
+
+  folders.sort();
+  return folders;
+}
+
+/**
+ * Parse and validate a single skill folder into a {@link ParsedSkill}. Throws
+ * {@link UploadRejectedError} when its SKILL.md is missing the required
+ * non-empty frontmatter so the caller can record it as a failed item.
+ */
+export function parseSkill(folder: string, files: Map<string, Uint8Array>): ParsedSkill {
   const prefix = `skills/${folder}/`;
   const manifest = files.get(`${prefix}SKILL.md`);
   // Guarded by the caller, which only invokes us for folders with a SKILL.md.
@@ -54,30 +85,4 @@ function parseSkill(folder: string, files: Map<string, Uint8Array>): ParsedSkill
   skillFiles.sort((a, b) => (a.relpath < b.relpath ? -1 : a.relpath > b.relpath ? 1 : 0));
 
   return { slug, description: cleanDescription, files: skillFiles };
-}
-
-/**
- * Discover and parse every skill in an unzipped archive. Each `skills/<folder>/`
- * holding a SKILL.md becomes one {@link ParsedSkill}. Throws
- * {@link UploadRejectedError} when the archive has no skill or a SKILL.md is
- * missing its required frontmatter.
- */
-export function extractSkills(files: Map<string, Uint8Array>): ParsedSkill[] {
-  const folders: string[] = [];
-  for (const path of files.keys()) {
-    const match = SKILL_MANIFEST.exec(path);
-    if (match) {
-      folders.push(match[1]);
-    }
-  }
-
-  if (folders.length === 0) {
-    throw new UploadRejectedError(
-      "no-skill",
-      "The archive does not contain a skills/<name>/SKILL.md file.",
-    );
-  }
-
-  folders.sort();
-  return folders.map((folder) => parseSkill(folder, files));
 }

@@ -33,6 +33,12 @@ export function createUploadStore(): UploadStore {
     storage: azureBlobStorageFromEnv(),
     newId: () => crypto.randomUUID(),
 
+    async createUploadRequest(ownerId, totalCount) {
+      const id = crypto.randomUUID();
+      await db.insert(uploadRequest).values({ id, ownerId, totalCount });
+      return id;
+    },
+
     async saveSkillVersion(record) {
       try {
         await db.transaction(async (tx) => {
@@ -56,8 +62,9 @@ export function createUploadStore(): UploadStore {
             .where(eq(content.id, record.contentId));
         });
       } catch (error) {
-        // Surface a duplicate name as a clean rejection (the caller cleans up the
-        // blobs); anything else is unexpected and propagates as a 500.
+        // Map a duplicate name to a clean, user-facing rejection; the caller
+        // records it as a failed item (with a generic message for anything else)
+        // and cleans up the just-written blobs.
         if (isUniqueViolation(error)) {
           throw new UploadRejectedError(
             "duplicate-name",
@@ -68,18 +75,12 @@ export function createUploadStore(): UploadStore {
       }
     },
 
-    async saveUploadRequest(ownerId, results) {
-      const id = crypto.randomUUID();
+    async updateUploadRequest(batchId, results) {
       const successCount = results.filter(isSuccess).length;
-      await db.insert(uploadRequest).values({
-        id,
-        ownerId,
-        totalCount: results.length,
-        successCount,
-        failureCount: results.length - successCount,
-        results,
-      });
-      return id;
+      await db
+        .update(uploadRequest)
+        .set({ successCount, failureCount: results.length - successCount, results })
+        .where(eq(uploadRequest.id, batchId));
     },
   };
 }
