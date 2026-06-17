@@ -1,7 +1,7 @@
 name: Code Review
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened]
 jobs:
   review:
     if: >-
