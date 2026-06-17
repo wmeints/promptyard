@@ -35,10 +35,37 @@ jobs:
           SCRIPTS_DIR="$TOOLS_DIR/scripts"
           mkdir -p "$SCRIPTS_DIR"
 
-          git show "origin/$BASE_REF:scripts/compute-tier.ts" > "$SCRIPTS_DIR/compute-tier.ts"
-          git show "origin/$BASE_REF:scripts/compute-final-tier.ts" > "$SCRIPTS_DIR/compute-final-tier.ts"
-          git show "origin/$BASE_REF:package.json" > "$TOOLS_DIR/package.json"
-          git show "origin/$BASE_REF:bun.lock" > "$TOOLS_DIR/bun.lock"
+          BASE_REF_FULL="origin/$BASE_REF"
+          TOOLS_REF="$BASE_REF_FULL"
+          if ! git cat-file -e "$BASE_REF_FULL:scripts/compute-final-tier.ts" 2>/dev/null && \
+             ! git cat-file -e "$BASE_REF_FULL:.claude/skills/pr-create/scripts/compute-final-tier.ts" 2>/dev/null; then
+            TOOLS_REF="HEAD"
+            echo "::warning::compute-final-tier.ts not found on $BASE_REF_FULL; bootstrapping gate scripts from HEAD for this PR."
+          fi
+
+          resolve_path() {
+            local ref="$1"
+            shift
+            for path in "$@"; do
+              if git cat-file -e "$ref:$path" 2>/dev/null; then
+                printf "%s" "$path"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          TIER_PATH="$(resolve_path "$TOOLS_REF" "scripts/compute-tier.ts" ".claude/skills/pr-create/scripts/compute-tier.ts")"
+          FINAL_PATH="$(resolve_path "$TOOLS_REF" "scripts/compute-final-tier.ts" ".claude/skills/pr-create/scripts/compute-final-tier.ts")"
+          if [ -z "$TIER_PATH" ] || [ -z "$FINAL_PATH" ]; then
+            echo "Unable to locate required tier scripts in $TOOLS_REF"
+            exit 1
+          fi
+
+          git show "$TOOLS_REF:$TIER_PATH" > "$SCRIPTS_DIR/compute-tier.ts"
+          git show "$TOOLS_REF:$FINAL_PATH" > "$SCRIPTS_DIR/compute-final-tier.ts"
+          git show "$TOOLS_REF:package.json" > "$TOOLS_DIR/package.json"
+          git show "$TOOLS_REF:bun.lock" > "$TOOLS_DIR/bun.lock"
 
           echo "tools_dir=$TOOLS_DIR" >> "$GITHUB_OUTPUT"
 
