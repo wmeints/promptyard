@@ -59,7 +59,7 @@ describe("createAzureBlobStorage", () => {
     expect(mocks.getContainerClient).toHaveBeenCalledWith("content");
   });
 
-  it("uploads block blob data with the content type", async () => {
+  it("uploads block blob data as a forced-download attachment", async () => {
     const storage = createAzureBlobStorage(config);
 
     await storage.put("content/c1/v1/SKILL.md", new Uint8Array([1, 2, 3]), "text/markdown");
@@ -67,7 +67,22 @@ describe("createAzureBlobStorage", () => {
     expect(mocks.getBlockBlobClient).toHaveBeenCalledWith("content/c1/v1/SKILL.md");
     const [data, options] = mocks.uploadData.mock.calls[0];
     expect(Array.from(data)).toEqual([1, 2, 3]);
-    expect(options.blobHTTPHeaders).toEqual({ blobContentType: "text/markdown" });
+    expect(options.blobHTTPHeaders).toEqual({
+      blobContentType: "text/markdown",
+      blobContentDisposition: "attachment",
+    });
+  });
+
+  it("defaults to an inert content type when none is given", async () => {
+    const storage = createAzureBlobStorage(config);
+
+    await storage.put("content/c1/v1/run.sh", new Uint8Array([1]));
+
+    const [, options] = mocks.uploadData.mock.calls[0];
+    expect(options.blobHTTPHeaders).toEqual({
+      blobContentType: "application/octet-stream",
+      blobContentDisposition: "attachment",
+    });
   });
 
   it("returns blob bytes on get", async () => {
