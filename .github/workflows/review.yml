@@ -25,54 +25,9 @@ jobs:
         with:
           bun-version: "1.3.5"
 
-      - name: Prepare trusted tier gate scripts
-        id: trusted
+      - name: Install tier gate dependencies
         shell: bash
-        env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
-        run: |
-          TOOLS_DIR="$RUNNER_TEMP/tier-gate"
-          SCRIPTS_DIR="$TOOLS_DIR/scripts"
-          mkdir -p "$SCRIPTS_DIR"
-
-          BASE_REF_FULL="origin/$BASE_REF"
-          TOOLS_REF="$BASE_REF_FULL"
-          if ! git cat-file -e "$BASE_REF_FULL:scripts/compute-final-tier.ts" 2>/dev/null && \
-             ! git cat-file -e "$BASE_REF_FULL:.claude/skills/pr-create/scripts/compute-final-tier.ts" 2>/dev/null; then
-            TOOLS_REF="HEAD"
-            echo "::warning::compute-final-tier.ts not found on $BASE_REF_FULL; bootstrapping gate scripts from HEAD for this PR."
-          fi
-
-          resolve_path() {
-            local ref="$1"
-            shift
-            for path in "$@"; do
-              if git cat-file -e "$ref:$path" 2>/dev/null; then
-                printf "%s" "$path"
-                return 0
-              fi
-            done
-            return 1
-          }
-
-          TIER_PATH="$(resolve_path "$TOOLS_REF" "scripts/compute-tier.ts" ".claude/skills/pr-create/scripts/compute-tier.ts")"
-          FINAL_PATH="$(resolve_path "$TOOLS_REF" "scripts/compute-final-tier.ts" ".claude/skills/pr-create/scripts/compute-final-tier.ts")"
-          if [ -z "$TIER_PATH" ] || [ -z "$FINAL_PATH" ]; then
-            echo "Unable to locate required tier scripts in $TOOLS_REF"
-            exit 1
-          fi
-
-          git show "$TOOLS_REF:$TIER_PATH" > "$SCRIPTS_DIR/compute-tier.ts"
-          git show "$TOOLS_REF:$FINAL_PATH" > "$SCRIPTS_DIR/compute-final-tier.ts"
-          git show "$TOOLS_REF:package.json" > "$TOOLS_DIR/package.json"
-          git show "$TOOLS_REF:bun.lock" > "$TOOLS_DIR/bun.lock"
-
-          echo "tools_dir=$TOOLS_DIR" >> "$GITHUB_OUTPUT"
-
-      - name: Install trusted tier gate dependencies
-        shell: bash
-        working-directory: ${{ steps.trusted.outputs.tools_dir }}
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Read LLM escalation marker from PR body
         id: marker
@@ -92,26 +47,13 @@ jobs:
         shell: bash
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
-          TOOLS_DIR: ${{ steps.trusted.outputs.tools_dir }}
         run: |
-          RESULT="$(bun run "$TOOLS_DIR/scripts/compute-final-tier.ts" --base "$BASE_REF" "${{ steps.marker.outputs.llm_escalation }}")"
+          RESULT="$(bun run scripts/compute-final-tier.ts --base "$BASE_REF" "${{ steps.marker.outputs.llm_escalation }}")"
           printf '%s\n' "$RESULT" > tier-result.json
 
           FINAL_TIER="$(jq -r '.final_tier' tier-result.json)"
           REVIEW_LABEL="$(jq -r '.review_label' tier-result.json)"
           HUMAN_REQUIRED="$(jq -r '.human_review_required' tier-result.json)"
-
-          # Backward compatibility: older trusted script versions may only emit final_tier.
-          if [ -z "$REVIEW_LABEL" ] || [ "$REVIEW_LABEL" = "null" ]; then
-            REVIEW_LABEL="review:$FINAL_TIER"
-          fi
-          if [ -z "$HUMAN_REQUIRED" ] || [ "$HUMAN_REQUIRED" = "null" ]; then
-            if [ "$FINAL_TIER" = "T1" ]; then
-              HUMAN_REQUIRED="false"
-            else
-              HUMAN_REQUIRED="true"
-            fi
-          fi
 
           if [ -z "$FINAL_TIER" ] || [ "$FINAL_TIER" = "null" ] || \
              ! [[ "$FINAL_TIER" =~ ^T[123]$ ]] || \
