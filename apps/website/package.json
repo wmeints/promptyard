@@ -18,6 +18,8 @@
     "db:studio": "bun --env-file=../../.env drizzle-kit studio"
   },
   "dependencies": {
+    "@azure/identity": "^4.13.1",
+    "@azure/storage-blob": "^12.32.0",
     "better-auth": "^1.6.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
