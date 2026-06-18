@@ -11,6 +11,18 @@ This is the standing contract for any coding agent assigned an issue.
 The issue is the **single source of truth**. Do not implement behaviour that is not
 specified, and do not work outside the declared scope.
 
+## 0. Work on a feature branch
+
+Never commit to the default branch. Before writing any code, create a branch whose prefix
+matches the kind of work:
+
+- `task/<task-name>` — a feature or task
+- `fix/<bug-name>` — a bug fix
+- `chore/<chore-name>` — maintenance, dependencies, tooling, or docs
+
+Use a short kebab-case name derived from the issue title (e.g. `task/parcel-bay-lookup`).
+All commits for the issue live on this branch; the PR merges it into the default branch.
+
 ## 1. Implement from the spec
 
 1. Read **Context & goal**, then treat each **Functional requirement** as a unit of work.
