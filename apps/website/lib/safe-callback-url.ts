@@ -8,7 +8,8 @@ const URL_SMUGGLING_CHARS = /[\t\n\r]/g;
  * ("//host") and backslash ("/\host") forms all resolve to another origin and
  * would otherwise be an open redirect, so they are rejected at the boundary.
  */
-export function toSafeCallbackURL(callbackURL: string): string {
+export function toSafeCallbackURL(callbackURL: string | undefined): string {
+  if (!callbackURL) return "/";
   const candidate = callbackURL.replace(URL_SMUGGLING_CHARS, "");
 
   if (
