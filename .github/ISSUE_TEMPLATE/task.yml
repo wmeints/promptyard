@@ -69,9 +69,9 @@ body:
       description: Binary, machine-checkable. The agent maps every functional requirement to a test before marking the PR ready. Replace the angle-bracket commands with this repo's real ones.
       value: |
         - [ ] Every functional requirement above has a corresponding automated test
-        - [ ] `<build>` passes
-        - [ ] `<lint>` passes
-        - [ ] `<test>` passes with no new failures
+        - [ ] `bun run build` passes
+        - [ ] `bun run lint` passes
+        - [ ] `bun run test` passes with no new failures
         - [ ] No secrets, keys, or PII committed
         - [ ] Behaviour change documented where it is publicly visible
     validations:
