@@ -37,13 +37,13 @@ export default async function UploadSummaryPage({ params }: UploadSummaryPagePro
 
   const created = request.results.filter((result) => result.status === "created");
   const failed = request.results.filter((result) => result.status === "failed");
+  const ignored = request.results.filter((result) => result.status === "ignored");
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight">Upload complete</h1>
       <p className="mt-2 text-muted-foreground">
-        {created.length === 1 ? "1 skill was" : `${created.length} skills were`} added to your
-        library
+        {created.length === 1 ? "1 item was" : `${created.length} items were`} added to your library
         {failed.length > 0 ? `, ${failed.length} could not be imported` : ""}.
       </p>
 
@@ -57,7 +57,7 @@ export default async function UploadSummaryPage({ params }: UploadSummaryPagePro
               <li key={result.contentId ?? result.name}>
                 <Card className="p-4">
                   <Link
-                    href={`/${owner.handle}/skills/${result.name}`}
+                    href={`/${owner.handle}/${result.type}s/${result.name}`}
                     className="font-medium hover:underline"
                   >
                     {result.name}
@@ -77,12 +77,34 @@ export default async function UploadSummaryPage({ params }: UploadSummaryPagePro
           </h2>
           <ul className="mt-4 flex flex-col gap-3">
             {failed.map((result) => (
-              <li key={`failed-${result.name}`}>
+              <li key={`failed-${result.type}-${result.name}`}>
                 <Card className="p-4">
                   <p className="font-medium">{result.name}</p>
                   <p className="mt-1 text-sm text-destructive">
                     {result.message ?? "Could not be imported."}
                   </p>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {ignored.length > 0 ? (
+        <section className="mt-8">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Ignored
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {ignored.length === 1 ? "1 file" : `${ignored.length} files`} outside{" "}
+            <code>skills/</code> and <code>agents/</code> (or OS/VCS junk){" "}
+            {ignored.length === 1 ? "was" : "were"} skipped.
+          </p>
+          <ul className="mt-4 flex flex-col gap-3">
+            {ignored.map((result) => (
+              <li key={`ignored-${result.name}`}>
+                <Card className="p-4">
+                  <p className="font-mono text-sm text-muted-foreground">{result.name}</p>
                 </Card>
               </li>
             ))}

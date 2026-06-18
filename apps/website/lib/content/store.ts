@@ -10,6 +10,10 @@ import { FIRST_VERSION, type UploadStore } from "./upload";
 const isSuccess = (result: UploadResult) =>
   result.status === "created" || result.status === "updated";
 
+// Ignored entries (junk, out-of-scope files) are recorded for the summary but
+// are neither successes nor failures, so they stay out of both audit counts.
+const isFailure = (result: UploadResult) => result.status === "failed";
+
 // PostgreSQL `unique_violation`. The `(owner, type, name)` constraint fires when
 // a skill of this name already exists — re-upload/versioning is a later slice.
 const UNIQUE_VIOLATION = "23505";
@@ -39,13 +43,13 @@ export function createUploadStore(): UploadStore {
       return id;
     },
 
-    async saveSkillVersion(record) {
+    async saveContentVersion(record) {
       try {
         await db.transaction(async (tx) => {
           await tx.insert(content).values({
             id: record.contentId,
             ownerId: record.ownerId,
-            type: "skill",
+            type: record.type,
             name: record.slug,
             description: record.description,
           });
@@ -54,6 +58,7 @@ export function createUploadStore(): UploadStore {
             contentId: record.contentId,
             version: FIRST_VERSION,
             description: record.description,
+            body: record.body,
             manifest: record.manifest,
           });
           await tx
@@ -64,11 +69,11 @@ export function createUploadStore(): UploadStore {
       } catch (error) {
         // Map a duplicate name to a clean, user-facing rejection; the caller
         // records it as a failed item (with a generic message for anything else)
-        // and cleans up the just-written blobs.
+        // and cleans up any just-written blobs.
         if (isUniqueViolation(error)) {
           throw new UploadRejectedError(
             "duplicate-name",
-            `You already have a skill named "${record.slug}".`,
+            `You already have ${record.type === "agent" ? "an agent" : "a skill"} named "${record.slug}".`,
           );
         }
         throw error;
@@ -76,10 +81,13 @@ export function createUploadStore(): UploadStore {
     },
 
     async updateUploadRequest(batchId, results) {
-      const successCount = results.filter(isSuccess).length;
       await db
         .update(uploadRequest)
-        .set({ successCount, failureCount: results.length - successCount, results })
+        .set({
+          successCount: results.filter(isSuccess).length,
+          failureCount: results.filter(isFailure).length,
+          results,
+        })
         .where(eq(uploadRequest.id, batchId));
     },
   };

@@ -26,10 +26,21 @@ describe("findSkillFolders", () => {
     expect(folders).toEqual(["alpha", "beta"]);
   });
 
-  it("rejects an archive with no skill", () => {
-    expect(() => findSkillFolders(archive({ "README.md": "nothing here" }))).toThrow(
-      UploadRejectedError,
+  it("returns an empty list when the archive has no skill", () => {
+    expect(findSkillFolders(archive({ "README.md": "nothing here" }))).toEqual([]);
+  });
+
+  it("drops junk files riding along inside a skill folder", () => {
+    const skill = parseSkill(
+      "demo",
+      archive({
+        "skills/demo/SKILL.md": skillManifest("Demo", "A demo"),
+        "skills/demo/.DS_Store": "junk",
+        "skills/demo/scripts/run.sh": "echo hi",
+      }),
     );
+
+    expect(skill.files.map((file) => file.relpath)).toEqual(["SKILL.md", "scripts/run.sh"]);
   });
 });
 
