@@ -1,0 +1,79 @@
+name: 🤖 Agent Task
+description: A spec an autonomous coding agent can implement, self-validate, and self-tier without a human round-trip.
+title: "[Task] "
+labels: ["agent-ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is the **single source of truth** for the agent. It will not assume anything that is not written here, so fill every required section precisely. Vague specs produce vague code.
+        The agent's standing protocol for reading this issue lives in `AGENTS.md`.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context & goal
+      description: Why this change exists and what "good" looks like. Describe the problem, not the solution.
+      placeholder: |
+        Users can't X because Y. After this change, they can X via Z. Success = ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Functional requirements
+      description: Numbered, individually testable statements. Prefer Given/When/Then. One behaviour per line.
+      placeholder: |
+        1. GIVEN an authenticated user WHEN they POST /widgets with a valid body THEN a 201 is returned with the created widget.
+        2. GIVEN an invalid body WHEN they POST /widgets THEN a 422 with an RFC 9457 problem detail is returned.
+    validations:
+      required: true
+
+  - type: textarea
+    id: contracts
+    attributes:
+      label: Interfaces & contracts
+      description: Exact signatures, routes, schemas, or types the implementation must match. Paste them — don't describe them.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: In scope / Out of scope
+      description: Explicit boundaries. The out-of-scope list is what stops the agent from yak-shaving.
+      placeholder: |
+        In scope:  the POST endpoint + validation + its tests.
+        Out of scope: list/GET endpoints, UI, auth changes, DB schema migrations.
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Technical constraints & pointers
+      description: Stack, patterns to imitate, files likely touched, and explicit prohibitions.
+      placeholder: |
+        - Follow the existing handler pattern in src/widgets/handlers.ts
+        - Reuse the zod schemas in src/validation/
+        - No new runtime dependencies
+        - Do NOT touch the auth middleware
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (pass/fail)
+      description: Binary, machine-checkable. The agent maps every functional requirement to a test before marking the PR ready. Replace the angle-bracket commands with this repo's real ones.
+      value: |
+        - [ ] Every functional requirement above has a corresponding automated test
+        - [ ] `<build>` passes
+        - [ ] `<lint>` passes
+        - [ ] `<test>` passes with no new failures
+        - [ ] No secrets, keys, or PII committed
+        - [ ] Behaviour change documented where it is publicly visible
+    validations:
+      required: true
