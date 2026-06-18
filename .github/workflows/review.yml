@@ -1,12 +1,157 @@
 name: Code Review
 on:
   pull_request:
-    types: [opened]
+    types:
+      [opened, edited, synchronize, reopened, labeled, unlabeled, ready_for_review, review_requested, review_request_removed]
 jobs:
+  enforce-tier:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    outputs:
+      final_tier: ${{ steps.compute.outputs.final_tier }}
+      review_label: ${{ steps.compute.outputs.review_label }}
+      human_review_required: ${{ steps.compute.outputs.human_review_required }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.5"
+
+      - name: Install tier gate dependencies
+        shell: bash
+        run: bun install --frozen-lockfile
+
+      - name: Read LLM escalation marker from PR body
+        id: marker
+        shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          LLM_ESCALATION="$(printf '%s' "${PR_BODY:-}" | tr -d '\r' | sed -nE 's/.*<!--[[:space:]]*llm_escalation:[[:space:]]*(NONE|T1|T2|T3)[[:space:]]*-->.*/\1/p' | head -n1)"
+          if [ -z "$LLM_ESCALATION" ]; then
+            echo "Missing required marker: <!-- llm_escalation: NONE|T1|T2|T3 -->"
+            exit 1
+          fi
+          echo "llm_escalation=$LLM_ESCALATION" >> "$GITHUB_OUTPUT"
+
+      - name: Compute deterministic final tier
+        id: compute
+        shell: bash
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          RESULT="$(bun run scripts/compute-final-tier.ts --base "$BASE_REF" "${{ steps.marker.outputs.llm_escalation }}")"
+          printf '%s\n' "$RESULT" > tier-result.json
+
+          node -e '
+            const fs = require("node:fs");
+            const outPath = process.env.GITHUB_OUTPUT;
+            const raw = fs.readFileSync("tier-result.json", "utf8");
+            const data = JSON.parse(raw);
+
+            const finalTier = data.final_tier;
+            const reviewLabel = data.review_label;
+            const humanRequired = data.human_review_required;
+
+            const validTier = /^(T1|T2|T3)$/.test(String(finalTier || ""));
+            const validLabel = /^review:T[123]$/.test(String(reviewLabel || ""));
+            const validHuman = typeof humanRequired === "boolean";
+            if (!validTier || !validLabel || !validHuman) {
+              console.error("Invalid compute-final-tier output:");
+              console.error(raw);
+              process.exit(1);
+            }
+
+            fs.appendFileSync(outPath, `final_tier=${finalTier}\n`);
+            fs.appendFileSync(outPath, `review_label=${reviewLabel}\n`);
+            fs.appendFileSync(outPath, `human_review_required=${humanRequired}\n`);
+          '
+
+      - name: Ensure review tier labels exist
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const labels = ["review:T1", "review:T2", "review:T3"];
+            for (const name of labels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color: "0052cc",
+                  description: "Deterministic review tier label",
+                });
+              }
+            }
+
+      - name: Sync deterministic review label
+        uses: actions/github-script@v8
+        env:
+          EXPECTED_LABEL: ${{ steps.compute.outputs.review_label }}
+        with:
+          script: |
+            const expected = process.env.EXPECTED_LABEL;
+            if (!expected || !/^review:T[123]$/.test(expected)) {
+              core.setFailed(`Invalid expected review label: '${expected ?? ""}'`);
+              return;
+            }
+            const issue_number = context.payload.pull_request.number;
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+            });
+
+            const current = issue.labels.map((label) => typeof label === "string" ? label : label.name);
+            const filtered = current.filter((name) => !/^review:T[123]$/.test(name));
+            const nextLabels = [...filtered, expected];
+
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              labels: nextLabels,
+            });
+
+      - name: Enforce human reviewer requirement
+        shell: bash
+        env:
+          HUMAN_REQUIRED: ${{ steps.compute.outputs.human_review_required }}
+          REQUESTED_REVIEWERS: ${{ toJson(github.event.pull_request.requested_reviewers) }}
+          REQUESTED_TEAMS: ${{ toJson(github.event.pull_request.requested_teams) }}
+        run: |
+          if [ "$HUMAN_REQUIRED" != "true" ]; then
+            exit 0
+          fi
+
+          REVIEWER_COUNT="$(echo "$REQUESTED_REVIEWERS" | jq 'length')"
+          TEAM_COUNT="$(echo "$REQUESTED_TEAMS" | jq 'length')"
+
+          if [ "$REVIEWER_COUNT" -eq 0 ] && [ "$TEAM_COUNT" -eq 0 ]; then
+            echo "human_review_required=true but no requested reviewers or teams are set"
+            exit 1
+          fi
+
   review:
+    needs: enforce-tier
     if: >-
-      contains(github.event.pull_request.labels.*.name, 'review:T1') ||
-      contains(github.event.pull_request.labels.*.name, 'review:T2')
+      needs.enforce-tier.outputs.final_tier == 'T1' ||
+      needs.enforce-tier.outputs.final_tier == 'T2'
     runs-on: ubuntu-latest
     permissions:
       contents: read
