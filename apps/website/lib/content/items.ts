@@ -21,9 +21,9 @@ export type Discovery = {
 const SKILL_PREFIX = /^skills\/([^/]+)\//;
 
 /**
- * Walk an unzipped archive once and bucket every entry: parse each skill folder
- * and agent file, collecting failures per item, and count everything else —
- * OS/VCS junk and anything outside a recognised skill or agent — as ignored.
+ * Bucket every entry in an unzipped archive: parse each skill folder and agent
+ * file, collecting failures per item, and count everything else — OS/VCS junk
+ * and anything outside a recognised skill or agent — as ignored.
  */
 export function discoverItems(files: Map<string, Uint8Array>): Discovery {
   const skillFolders = findSkillFolders(files);

@@ -1,7 +1,4 @@
-import { slugify } from "@/lib/slug";
-
-import { UploadRejectedError } from "./errors";
-import { nonEmpty, parseFrontmatter } from "./frontmatter";
+import { parseRequiredFrontmatter } from "./frontmatter";
 import { isJunk } from "./junk";
 
 // A skill is a `skills/<folder>/` directory whose root holds a SKILL.md.
@@ -46,25 +43,10 @@ export function parseSkill(folder: string, files: Map<string, Uint8Array>): Pars
   const prefix = `skills/${folder}/`;
   const manifest = files.get(`${prefix}SKILL.md`);
   // Guarded by the caller, which only invokes us for folders with a SKILL.md.
-  const { name, description } = parseFrontmatter(new TextDecoder().decode(manifest));
-
-  const cleanName = nonEmpty(name);
-  const cleanDescription = nonEmpty(description);
-  if (!cleanName || !cleanDescription) {
-    throw new UploadRejectedError(
-      "invalid-frontmatter",
-      `skills/${folder}/SKILL.md must define a non-empty name and description.`,
-    );
-  }
-
-  // The slug is the stable identity; the raw frontmatter name is discarded.
-  const slug = slugify(cleanName);
-  if (!slug) {
-    throw new UploadRejectedError(
-      "invalid-frontmatter",
-      `The name in skills/${folder}/SKILL.md does not produce a valid slug.`,
-    );
-  }
+  const { slug, description } = parseRequiredFrontmatter(
+    new TextDecoder().decode(manifest),
+    `${prefix}SKILL.md`,
+  );
 
   const skillFiles: SkillFile[] = [];
   for (const [path, data] of files) {
@@ -76,5 +58,5 @@ export function parseSkill(folder: string, files: Map<string, Uint8Array>): Pars
   }
   skillFiles.sort((a, b) => (a.relpath < b.relpath ? -1 : a.relpath > b.relpath ? 1 : 0));
 
-  return { type: "skill", slug, description: cleanDescription, files: skillFiles };
+  return { type: "skill", slug, description, files: skillFiles };
 }

@@ -1,7 +1,4 @@
-import { slugify } from "@/lib/slug";
-
-import { UploadRejectedError } from "./errors";
-import { nonEmpty, parseFrontmatter } from "./frontmatter";
+import { parseRequiredFrontmatter } from "./frontmatter";
 
 // An agent is a single markdown file at `agents/<name>.md`; there are no
 // sub-files, so anything nested deeper is not an agent.
@@ -46,25 +43,7 @@ export function parseAgent(path: string, files: Map<string, Uint8Array>): Parsed
   const file = files.get(path);
   // Guarded by the caller, which only invokes us for discovered agent files.
   const body = new TextDecoder().decode(file);
-  const { name, description } = parseFrontmatter(body);
+  const { slug, description } = parseRequiredFrontmatter(body, path);
 
-  const cleanName = nonEmpty(name);
-  const cleanDescription = nonEmpty(description);
-  if (!cleanName || !cleanDescription) {
-    throw new UploadRejectedError(
-      "invalid-frontmatter",
-      `${path} must define a non-empty name and description.`,
-    );
-  }
-
-  // The slug is the stable identity; the raw frontmatter name is discarded.
-  const slug = slugify(cleanName);
-  if (!slug) {
-    throw new UploadRejectedError(
-      "invalid-frontmatter",
-      `The name in ${path} does not produce a valid slug.`,
-    );
-  }
-
-  return { type: "agent", slug, description: cleanDescription, body };
+  return { type: "agent", slug, description, body };
 }

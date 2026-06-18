@@ -10,6 +10,10 @@ import { FIRST_VERSION, type UploadStore } from "./upload";
 const isSuccess = (result: UploadResult) =>
   result.status === "created" || result.status === "updated";
 
+// Ignored entries (junk, out-of-scope files) are recorded for the summary but
+// are neither successes nor failures, so they stay out of both audit counts.
+const isFailure = (result: UploadResult) => result.status === "failed";
+
 // PostgreSQL `unique_violation`. The `(owner, type, name)` constraint fires when
 // a skill of this name already exists — re-upload/versioning is a later slice.
 const UNIQUE_VIOLATION = "23505";
@@ -77,10 +81,13 @@ export function createUploadStore(): UploadStore {
     },
 
     async updateUploadRequest(batchId, results) {
-      const successCount = results.filter(isSuccess).length;
       await db
         .update(uploadRequest)
-        .set({ successCount, failureCount: results.length - successCount, results })
+        .set({
+          successCount: results.filter(isSuccess).length,
+          failureCount: results.filter(isFailure).length,
+          results,
+        })
         .where(eq(uploadRequest.id, batchId));
     },
   };
