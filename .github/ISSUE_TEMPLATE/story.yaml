@@ -1,0 +1,67 @@
+name: User Story
+description: A detailed piece of functionality that is added or modified in the project
+title: ""
+labels: ["kind:story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue describes detailed functionality that we should add or modify in the application. It's important that we keep this user focused.
+        We'll split the user story into agent tasks so the agent has focused work items to operate on.
+
+        Describe the user story as "As a <role> I want <functionality> so that <goal>". 
+        And then add more detail as needed to make the story detailed enough to split into tasks.
+
+      label: "Story"
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Functional requirements
+      description: Numbered, individually testable statements. Prefer Given/When/Then. One behaviour per line.
+      placeholder: |
+        1. GIVEN an authenticated user WHEN they POST /widgets with a valid body THEN a 201 is returned with the created widget.
+        2. GIVEN an invalid body WHEN they POST /widgets THEN a 422 with an RFC 9457 problem detail is returned.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: In scope / Out of scope
+      description: Explicit boundaries. The out-of-scope list is what stops the agent from yak-shaving.
+      placeholder: |
+        In scope:  the POST endpoint + validation + its tests.
+        Out of scope: list/GET endpoints, UI, auth changes, DB schema migrations.
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Technical constraints & pointers
+      description: Stack, patterns to imitate, files likely touched, and explicit prohibitions.
+      placeholder: |
+        - Follow the existing handler pattern in src/widgets/handlers.ts
+        - Reuse the zod schemas in src/validation/
+        - No new runtime dependencies
+        - Do NOT touch the auth middleware
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (pass/fail)
+      description: Binary, machine-checkable. The agent maps every functional requirement to a test before marking the PR ready. Replace the angle-bracket commands with this repo's real ones.
+      value: |
+        - [ ] Every functional requirement above has a corresponding automated test
+        - [ ] `<build>` passes
+        - [ ] `<lint>` passes
+        - [ ] `<test>` passes with no new failures
+        - [ ] No secrets, keys, or PII committed
+        - [ ] Behaviour change documented where it is publicly visible
+    validations:
+      required: true
