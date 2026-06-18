@@ -6,6 +6,12 @@ const FRONTMATTER = /^﻿?---\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/;
 
 export type Frontmatter = { name?: string; description?: string };
 
+/** Trim a frontmatter value, collapsing blank or absent ones to `undefined`. */
+export function nonEmpty(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 /**
  * Pull the `name` and `description` out of a SKILL.md YAML frontmatter block.
  * Returns an empty object when the fence is missing or the YAML is malformed;

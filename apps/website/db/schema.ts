@@ -33,11 +33,14 @@ export const contentType = pgEnum("content_type", ["skill", "agent"]);
 /** One file inside a skill's version snapshot, as stored in Azure Blob. */
 export type ManifestEntry = { path: string; blobKey: string; size: number };
 
-/** Per-item outcome recorded against an upload request. */
+/**
+ * Per-item outcome recorded against an upload request. `ignored` entries (junk
+ * or out-of-scope files) carry just the path in `name` and no `type`.
+ */
 export type UploadResult = {
-  type: "skill" | "agent";
+  type?: "skill" | "agent";
   name: string;
-  status: "created" | "updated" | "failed";
+  status: "created" | "updated" | "failed" | "ignored";
   message?: string;
   contentId?: string;
 };

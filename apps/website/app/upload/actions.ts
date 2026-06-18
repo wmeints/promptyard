@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { UploadRejectedError } from "@/lib/content/errors";
 import { createUploadStore } from "@/lib/content/store";
-import { processSkillUpload } from "@/lib/content/upload";
+import { processUpload } from "@/lib/content/upload";
 import { getCurrentSession } from "@/lib/session";
 
 export type UploadState = { error?: string };
@@ -30,7 +30,7 @@ export async function uploadSkill(_prev: UploadState, formData: FormData): Promi
 
   let batchId: string;
   try {
-    batchId = await processSkillUpload(session.user.id, archive, createUploadStore());
+    batchId = await processUpload(session.user.id, archive, createUploadStore());
   } catch (error) {
     if (error instanceof UploadRejectedError) {
       return { error: error.message };

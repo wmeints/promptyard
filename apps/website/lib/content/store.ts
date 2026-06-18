@@ -39,13 +39,13 @@ export function createUploadStore(): UploadStore {
       return id;
     },
 
-    async saveSkillVersion(record) {
+    async saveContentVersion(record) {
       try {
         await db.transaction(async (tx) => {
           await tx.insert(content).values({
             id: record.contentId,
             ownerId: record.ownerId,
-            type: "skill",
+            type: record.type,
             name: record.slug,
             description: record.description,
           });
@@ -54,6 +54,7 @@ export function createUploadStore(): UploadStore {
             contentId: record.contentId,
             version: FIRST_VERSION,
             description: record.description,
+            body: record.body,
             manifest: record.manifest,
           });
           await tx
@@ -64,11 +65,11 @@ export function createUploadStore(): UploadStore {
       } catch (error) {
         // Map a duplicate name to a clean, user-facing rejection; the caller
         // records it as a failed item (with a generic message for anything else)
-        // and cleans up the just-written blobs.
+        // and cleans up any just-written blobs.
         if (isUniqueViolation(error)) {
           throw new UploadRejectedError(
             "duplicate-name",
-            `You already have a skill named "${record.slug}".`,
+            `You already have ${record.type === "agent" ? "an agent" : "a skill"} named "${record.slug}".`,
           );
         }
         throw error;

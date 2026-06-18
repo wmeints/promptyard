@@ -7,7 +7,7 @@ export type RejectReason =
   | "unsafe-path"
   | "symlink"
   | "invalid-zip"
-  | "no-skill"
+  | "no-content"
   | "invalid-frontmatter"
   | "duplicate-name";
 
@@ -24,4 +24,15 @@ export class UploadRejectedError extends Error {
     super(message);
     this.name = "UploadRejectedError";
   }
+}
+
+const ITEM_FAILED_FALLBACK = "Something went wrong importing this item.";
+
+/**
+ * The user-facing message for a per-item failure. Only an actionable rejection
+ * carries one; anything else is unexpected and gets a generic message so
+ * internals never leak into the summary.
+ */
+export function failureMessage(error: unknown): string {
+  return error instanceof UploadRejectedError ? error.message : ITEM_FAILED_FALLBACK;
 }
