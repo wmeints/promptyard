@@ -16,9 +16,10 @@ specified, and do not work outside the declared scope.
 Never commit to the default branch. Before writing any code, create a branch whose prefix
 matches the kind of work:
 
-- `task/<task-name>` — a feature or task
+- `feat/<task-name>` — a feature or task
 - `fix/<bug-name>` — a bug fix
-- `chore/<chore-name>` — maintenance, dependencies, tooling, or docs
+- `chore/<chore-name>` — maintenance, dependencies, tooling
+- `docs/<improvement-name>` - improvement to docs
 
 Use a short kebab-case name derived from the issue title (e.g. `task/parcel-bay-lookup`).
 All commits for the issue live on this branch; the PR merges it into the default branch.
