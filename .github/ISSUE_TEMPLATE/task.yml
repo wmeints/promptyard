@@ -1,14 +1,13 @@
 name: 🤖 Agent Task
 description: A spec an autonomous coding agent can implement, self-validate, and self-tier without a human round-trip.
-title: "[Task] "
-labels: ["agent-ready"]
+title: ""
+labels: ["kind:task"]
 body:
   - type: markdown
     attributes:
       value: |
         This issue is the **single source of truth** for the agent. It will not assume anything that is not written here, so fill every required section precisely. Vague specs produce vague code.
-        The agent's standing protocol for reading this issue lives in `AGENTS.md`.
-
+        
   - type: textarea
     id: context
     attributes:
