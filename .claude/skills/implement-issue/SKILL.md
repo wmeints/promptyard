@@ -6,11 +6,50 @@ description: Use this skill to implement a user story based on a GitHub issue re
 Use this skill to implement a user story based on a GitHub issue reference.
 Make sure to follow the workflow defined below to implement the issue.
 
-## Workflow
+This is the standing contract for any coding agent assigned an issue.
 
-1. Read the issue $ARGS
-2. Create a new feature branch for the implementation of the issue
-3. Create a TODO list with the tasks in the order of implementation necessary to implement the issue
-3. Use dedicated sub agents to implement + verify each step in the TODO list.
-4. Run a final code review and make sure all items on the review checklist in the issue are done.
-5. Create a pull request for the issue on GitHub
+The issue is the **single source of truth**. Do not implement behaviour that is not
+specified, and do not work outside the declared scope.
+
+## 1. Implement from the spec
+
+1. Read **Context & goal**, then treat each **Functional requirement** as a unit of work.
+2. Match **Interfaces & contracts** exactly — signatures, routes, and schemas are literal.
+3. Stay inside **In scope**; never touch anything in **Out of scope**.
+4. Obey every line in **Technical constraints & pointers**, including prohibitions
+   (e.g. "no new dependencies"). Imitate the referenced existing code rather than
+   inventing new patterns.
+5. Implement each requirement using **red-green-refactor**:
+   - **Red** — write a failing test that pins the requirement before writing any production code.
+   - **Green** — write the minimum code needed to make that test pass.
+   - **Refactor** — improve the design with the test suite green; never refactor on red.
+     Commit at each green so the history shows the cycle, and never write production code that no
+     failing test demanded.
+
+### Code-writing ladder
+
+When the green step needs new code, walk these rungs top to bottom and apply the **last** one
+that matches. Each rung is only reached when the one above it didn't resolve the need.
+
+1. **Don't.** Confirm the code is actually needed. If not, leave it out.
+2. **Platform built-in.** If it is needed, check whether Node or Next.js already provides it — use that.
+3. **Existing dependency.** Otherwise, check the project's current dependencies and call a function from one.
+4. **New dependency.** If none fits, find a suitable package on the npm registry and use it.
+5. **Write it yourself.** Only when none of the above apply, write the code by hand.
+
+## 2. Self-validate before marking the PR ready
+
+The **Acceptance criteria** checklist is the gate. The PR may only be marked ready when:
+
+- Every functional requirement has at least one automated test that exercises it.
+- Every box in the acceptance checklist is genuinely checked (build, lint, test, no secrets, docs).
+- You restate the requirement → test mapping in the PR description (one line per requirement).
+
+If any box cannot be checked, the PR is not ready — fix it, or flag the blocker in the issue.
+
+## 3. Run a code review
+
+Before marking the PR ready, run the `/code-review` skill over your own diff and resolve its
+findings. This is a required gate, not advisory — do not mark the PR ready while findings are open.
+
+Review-tier assignment is handled separately by a script; do not compute it here.
